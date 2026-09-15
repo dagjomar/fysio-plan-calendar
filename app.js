@@ -641,8 +641,9 @@ if (document.readyState === 'loading') {
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch((err) => {
-        console.log('ServiceWorker registrering feilet (normalt i ubeskyttet dev-miljø):', err);
+      // Bruk relativ sti til sw.js basert på gjeldende underkatalog (f.eks. GitHub Pages repo path)
+      navigator.serviceWorker.register('sw.js').catch((err) => {
+        console.log('ServiceWorker registrering feilet:', err);
       });
     });
   }

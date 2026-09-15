@@ -2,7 +2,7 @@
   "name": "Akilles Opptrening",
   "short_name": "Akilles",
   "description": "Treningsplan og kalender for opptrening av akillessene uke 24-28",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#2563eb",

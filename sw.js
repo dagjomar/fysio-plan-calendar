@@ -1,14 +1,13 @@
 // sw.js - Service Worker for offline-støtte på mobil
-const CACHE_NAME = 'akilles-fysio-v1';
+const CACHE_NAME = 'akilles-fysio-v2';
 const ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './app.js',
-  './tracker-core.js',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  'index.html',
+  'style.css',
+  'app.js',
+  'tracker-core.js',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -44,7 +43,7 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Fallback til index.html ved navigasjonsforespørsler
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+          return caches.match('index.html');
         }
       });
     })
