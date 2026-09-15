@@ -15,6 +15,15 @@ Interaktiv treningsplan og kalender for opptrening etter akillesseneruptur, spes
 - **Kjernelogikk og Enhetstester (`tracker-core.js` & `tests/`)**:
   - Testet med Node.js sitt innebygde testverktøy (`node --test`).
 
+## GitHub Pages
+
+Appen er klargjort for automatisk publisering på GitHub Pages via GitHub Actions:
+- **URL etter publisering:** `https://dagjomar.github.io/fysio-plan-calendar/`
+- **Aktivering i repo-innstillinger på GitHub:**
+  1. Gå til repositoriets **Settings** &rarr; **Pages**.
+  2. Under **Build and deployment** / **Source**, velg **GitHub Actions** (eller **Deploy from a branch** &rarr; velg `main` og `/ (root)`).
+  3. Når pull requesten merges til `main`, rulles web-appen automatisk ut og er tilgjengelig umiddelbart på mobilen din.
+
 ## Komme i gang
 
 ### Bruk på Mobil (PWA / Web-app på hjemskjermen)
