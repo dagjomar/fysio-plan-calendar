@@ -1,0 +1,19 @@
+{
+  "name": "fysio-plan-calendar",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Interaktiv treningsplan og kalender for opptrening av akillesseneruptur",
+  "scripts": {
+    "start": "npx --yes serve -l 3000 .",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "fysioterapi",
+    "akilles",
+    "opptrening",
+    "kalender",
+    "treningstracker"
+  ],
+  "author": "Dag Jomar Mersland",
+  "license": "MIT"
+}
