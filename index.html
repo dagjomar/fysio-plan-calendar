@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Akilles Opptrening – 4-Ukers Treningskalender</title>
-  <meta name="description" content="Mobilvennlig treningsplan og kalender for opptrening av akillessene i uke 24-28">
+  <title>Akilles Opptrening – Treningskalender</title>
+  <meta name="description" content="Kompakt treningsplan og git-oversikt for opptrening av akillessene i uke 24-28">
   <meta name="theme-color" content="#2563eb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,153 +17,87 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Toppmeny & Overskrift -->
-    <header class="app-header">
-      <div class="header-content">
-        <div class="badge-tag">Fysioterapi Opptrening · Uke 24–28</div>
-        <h1>Akilles Senerehabilitering</h1>
-        <p class="subtitle">
-          Konkret opplegg for neste 4-ukers periode (12. september – 12. oktober). 
-          Trening annenhver dag med 3 fokuserte øvelser.
-        </p>
+  <div class="app-compact-container">
+    <!-- Topplinje -->
+    <header class="compact-header">
+      <div class="brand-line">
+        <span class="brand-badge">Uke 24–28</span>
+        <h1 class="brand-title">Akilles Trening</h1>
+        <span class="brand-progress" id="compactProgressLabel">0 / 16 fullført (0%)</span>
       </div>
-      <div class="header-actions no-print">
-        <button id="themeToggleBtn" class="btn btn-secondary" title="Bytt mellom lyst og mørkt tema">
-          <span class="icon">🌓</span> <span class="btn-text">Tema</span>
+      <div class="header-tools no-print">
+        <button id="themeToggleBtn" class="icon-btn" title="Bytt lyst/mørkt tema" aria-label="Tema">
+          <span class="icon">🌓</span>
         </button>
-        <button id="printBtn" class="btn btn-secondary" title="Skriv ut treningsplanen">
-          <span class="icon">🖨️</span> <span class="btn-text">Skriv ut</span>
+        <button id="editExercisesBtn" class="icon-btn" title="Tilpass øvelser" aria-label="Tilpass øvelser">
+          <span class="icon">✏️</span>
         </button>
-        <button id="editExercisesBtn" class="btn btn-primary" title="Rediger øvelser for ukene">
-          <span class="icon">✏️</span> <span class="btn-text">Tilpass øvelser</span>
+        <button id="infoToggleBtn" class="icon-btn" title="Vis prinsipper og info" aria-label="Info">
+          <span class="icon">ℹ️</span>
+        </button>
+        <button id="resetCheckboxesBtn" class="icon-btn" title="Nullstill avkrysninger" aria-label="Nullstill">
+          <span class="icon">🔄</span>
         </button>
       </div>
     </header>
 
-    <!-- Motivasjons- og statusseksjon -->
-    <section class="dashboard-section">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">🎯</div>
-          <div class="stat-info">
-            <span class="stat-label">Fullførte økter</span>
-            <span class="stat-value" id="completedCount">0 / 16</span>
-          </div>
-          <div class="stat-sub" id="completedPercentage">0% av perioden</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">🔥</div>
-          <div class="stat-info">
-            <span class="stat-label">Gjennomføringsstreak</span>
-            <span class="stat-value" id="currentStreak">0 økter</span>
-          </div>
-          <div class="stat-sub">Konsistens bygger senen</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">⏳</div>
-          <div class="stat-info">
-            <span class="stat-label">Gjenstående økter</span>
-            <span class="stat-value" id="remainingCount">16</span>
-          </div>
-          <div class="stat-sub">Fram til 12. oktober</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">📅</div>
-          <div class="stat-info">
-            <span class="stat-label">Neste økt</span>
-            <span class="stat-value" id="nextWorkoutDay">Lør 12. sep</span>
-          </div>
-          <div class="stat-sub" id="daysUntilNext">Klar for start!</div>
+    <!-- Git Commit Stats Heatmap / Rutenettoversikt -->
+    <section class="heatmap-section" aria-label="Treningskalender oversikt">
+      <div class="heatmap-header">
+        <span class="heatmap-title">📅 Fremdrift & dager (15. sep – 15. okt)</span>
+        <div class="heatmap-legend">
+          <span class="legend-item"><span class="legend-swatch done"></span> Fullført</span>
+          <span class="legend-item"><span class="legend-swatch workout"></span> Trening</span>
+          <span class="legend-item"><span class="legend-swatch rest"></span> Hvile</span>
         </div>
       </div>
 
-      <!-- Hovedprogresjonslinje -->
-      <div class="progress-bar-container">
-        <div class="progress-bar-header">
-          <span>Total fremgang for denne 4-ukers fasen</span>
-          <strong id="progressText">0% fullført</strong>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
-        </div>
-      </div>
-
-      <!-- Motiverende sitat / råd -->
-      <div class="motivation-banner" id="motivationBanner">
-        <span class="banner-icon">💡</span>
-        <p class="banner-text" id="motivationText">
-          Klar for start! Hver eneste tåhev legger grunnlaget for en sterk og elastisk akillessene.
-        </p>
+      <!-- Kompakt Git Commit Style Grid -->
+      <div class="heatmap-grid" id="heatmapGrid" role="list" aria-label="Dager i perioden">
+        <!-- Genereres av JavaScript -->
       </div>
     </section>
 
-    <!-- Filter- og visningskontroll -->
-    <nav class="filter-nav no-print">
-      <div class="filter-tabs">
-        <button class="filter-btn active" data-filter="all">Alle dager (31)</button>
-        <button class="filter-btn" data-filter="workout-only">Kun treningsdager (16)</button>
-        <button class="filter-btn" data-filter="week-0">Uke 24</button>
-        <button class="filter-btn" data-filter="week-1">Uke 25</button>
-        <button class="filter-btn" data-filter="week-2">Uke 26</button>
-        <button class="filter-btn" data-filter="week-3">Uke 27/28</button>
-      </div>
-
-      <div class="quick-tools">
-        <button id="resetCheckboxesBtn" class="btn btn-ghost" title="Nullstill alle avkrysninger">
-          <span>🔄</span> Nullstill
+    <!-- Aktiv dag og navigasjon -->
+    <section class="day-view-section">
+      <!-- Dagvelger kontroller -->
+      <div class="day-picker-bar">
+        <button id="prevDayBtn" class="nav-step-btn" title="Forrige dag" aria-label="Forrige dag">
+          ‹ Forrige
+        </button>
+        <div class="selected-day-meta">
+          <button id="todayJumpBtn" class="today-chip" title="Gå til i dag">I dag</button>
+          <div class="selected-day-title" id="selectedDayTitle">Tirsdag 15. september</div>
+          <div class="selected-day-sub" id="selectedDaySub">Uke 24 · Økt 1 av 16</div>
+        </div>
+        <button id="nextDayBtn" class="nav-step-btn" title="Neste dag" aria-label="Neste dag">
+          Neste ›
         </button>
       </div>
-    </nav>
 
-    <!-- Hovedkalender & ukeoversikt -->
-    <main id="calendarContainer" class="calendar-container">
-      <!-- Genereres dynamisk av app.js -->
-    </main>
-
-    <!-- Retningslinjer & Fysiologiske prinsipper -->
-    <section class="guidelines-section">
-      <h2>Viktige prinsipper for akillesopptrening i Uke 24–28</h2>
-      <div class="guidelines-grid">
-        <div class="guide-card">
-          <h3>⏱️ Hvorfor annenhver dag?</h3>
-          <p>
-            Etter tung styrkebelastning trenger kollagentr اساسene i akillessenen 36–48 timer 
-            på å syntetisere nye proteiner og bli sterkere (superkompensasjon). 
-            Trening hver dag bryter ned senen fortere enn den rekker å bygge seg opp.
-          </p>
-        </div>
-
-        <div class="guide-card">
-          <h3>🚦 Smertevurdering (24-timers-regelen)</h3>
-          <p>
-            Smerte under økten kan være opptil 3–4 på en skala fra 0–10. 
-            <strong>Kriteriet:</strong> Eventuell morgenstivhet eller ømhet neste dag 
-            skal være tilbake på utgangspunktet innen 24 timer før neste økt.
-          </p>
-        </div>
-
-        <div class="guide-card">
-          <h3>📈 Progresjonsmodell</h3>
-          <p>
-            Når 3 x 15 repetisjoner med egenvekt går lett og smertefritt, 
-            legges det til ekstra vekt i en ryggsekk eller manual (Heavy Slow Resistance). 
-            Hold 2 sekunder i topposisjon for optimal stimulering.
-          </p>
-        </div>
+      <!-- Kort for valgt dag (kompakt, ettblikk) -->
+      <div class="day-action-card" id="dayActionCard">
+        <!-- Renderes dynamisk -->
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="app-footer no-print">
-      <p>
-        Opptreningsplan tilpasset akillesseneruptur uke 24–28. Utviklet for 
-        <strong>fysio-plan-calendar</strong>. Følg alltid individuelle råd fra din behandlende fysioterapeut.
-      </p>
-    </footer>
+    <!-- Valgfri sammenleggbar info / fysiologiske prinsipper -->
+    <details class="principles-accordion no-print" id="principlesAccordion">
+      <summary class="principles-summary">
+        <span>💡 Viktige prinsipper for akillesopptrening (24-timers-regel & hvile)</span>
+      </summary>
+      <div class="principles-content">
+        <div class="principle-box">
+          <strong>⏱️ Annenhver dag:</strong> Kollagensyntesen i akillessenen trenger 36–48 timer hvile for superkompensasjon og forsterkning.
+        </div>
+        <div class="principle-box">
+          <strong>🚦 24-timers-regelen:</strong> Smerte under trening opptil 3–4/10 er tillatt, men eventuell morgenstivhet neste dag skal være tilbake til baseline før neste økt.
+        </div>
+        <div class="principle-box">
+          <strong>🐢 Rolig tempo (HSR):</strong> 3 sek opp, 2 sek toppstopp, 3 sek kontrollert ned.
+        </div>
+      </div>
+    </details>
   </div>
 
   <!-- Modal for å tilpasse ukesøvelser -->
@@ -175,27 +109,22 @@
       </div>
       <div class="modal-body">
         <p class="modal-intro">
-          Planene endrer seg fra uke til uke. Her kan du tilpasse de 3 øvelsene for hver uke 
-          etter avtale med fysioterapeuten din. Endringene lagres automatisk i nettleseren.
+          Tilpass de 3 øvelsene for hver uke etter avtale med fysioterapeuten din. Endringene lagres i nettleseren.
         </p>
-        
         <div class="week-selector">
           <label for="modalWeekSelect">Velg uke å redigere:</label>
           <select id="modalWeekSelect">
-            <option value="0">Uke 24 (12. sep – 18. sep)</option>
-            <option value="1">Uke 25 (19. sep – 25. sep)</option>
-            <option value="2">Uke 26 (26. sep – 2. okt)</option>
-            <option value="3">Uke 27/28 (3. okt – 12. okt)</option>
+            <option value="0">Uke 24 (15. sep – 21. sep)</option>
+            <option value="1">Uke 25 (22. sep – 28. sep)</option>
+            <option value="2">Uke 26 (29. sep – 5. okt)</option>
+            <option value="3">Uke 27/28 (6. okt – 15. okt)</option>
           </select>
         </div>
-
-        <div id="modalExercisesForm" class="exercises-form">
-          <!-- 3 øvelser input felter -->
-        </div>
+        <div id="modalExercisesForm" class="exercises-form"></div>
       </div>
       <div class="modal-footer">
-        <button id="restoreDefaultExercisesBtn" class="btn btn-secondary">Tilbakestill til standard</button>
-        <button id="saveExercisesBtn" class="btn btn-primary">Lagre endringer</button>
+        <button id="restoreDefaultExercisesBtn" class="btn btn-secondary">Tilbakestill standard</button>
+        <button id="saveExercisesBtn" class="btn btn-primary">Lagre</button>
       </div>
     </div>
   </div>

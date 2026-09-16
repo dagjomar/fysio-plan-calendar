@@ -1,12 +1,16 @@
 # Fysio Plan Calendar – Akilles Senerehabilitering
 
-Interaktiv treningsplan og kalender for opptrening etter akillesseneruptur, spesifikt tilpasset **Uke 24 til 28** (12. september – 12. oktober).
+Interaktiv treningsplan og kalender for opptrening etter akillesseneruptur, spesifikt tilpasset **Uke 24 til 28** (15. september – 15. oktober).
 
 ## Innhold
 
 - **Interaktiv Web-App (`index.html`)**:
-  - Oversikt over alle dager og de 16 planlagte treningsøktene (annenhver dag).
-  - Avkrysning per øvelse og per dag med direkte lagring i nettleseren (`localStorage`).
+  - Kompakt visning der alt passer på én skjerm uten unødvendig scrolling.
+  - Git commit-stats kalenderrutenett med fargede firkanter og fargekoding for treningsdager, hviledager og fullførte dager.
+  - Enkel dag-velger med neste/forrige og hurtigknapp for «I dag».
+  - Ett-klikks knapp for å markere hele treningen som fullført, samt kompakte linjer med avkrysningsbokser for hver øvelse.
+  - Direkte lokal lagring i nettleseren (`localStorage`).
+  - Lyst og mørkt tema.
   - Beregning av streak, fullførte økter og visuell fremdriftsindikator.
   - Tilpasning av øvelser uke for uke etter avtale med fysioterapeut.
   - Lyst og mørkt tema, samt A4-utskriftsvennlig visning.

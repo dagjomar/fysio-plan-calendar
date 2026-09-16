@@ -1,6 +1,6 @@
 # Opptrening etter Akillesseneruptur – 4-Ukers Treningsplan (Uke 24–28)
 
-**Periode:** 12. september – 12. oktober  
+**Periode:** 15. september – 15. oktober  
 **Fokus:** Neste rehabiliteringsfase · Styrke, seneadapsjon og elastisitet  
 **Frekvens:** Annenhver dag (16 treningsøkter, 15 hviledager)  
 **Struktur per økt:** 3 konkrete øvelser  
@@ -44,28 +44,28 @@
 
 ## 🗓️ Uke-for-uke Kalender med Avkrysning
 
-### Uke 24 (12. september – 18. september)
+### Uke 24 (15. september – 21. september)
 *Mål: Etablere stabil rytme annenhver dag og sikre god dybde/høyde i tåhev.*
 
-- [ ] **Lørdag 12. september (Økt 1):**
+- [ ] **Tirsdag 15. september (Økt 1):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (3 x 10–12 reps)
   - [ ] Øvelse 2: Sittende tåhev med vekt (3 x 12–15 reps)
   - [ ] Øvelse 3: Eksentrisk senkning over trappetrinn (3 x 10 reps)
   - *Notater:* _____________________________________________
-- 💤 *Søndag 13. september:* Hviledag / restitusjon
-- [ ] **Mandag 14. september (Økt 2):**
+- 💤 *Onsdag 16. september:* Hviledag / restitusjon
+- [ ] **Torsdag 17. september (Økt 2):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (3 x 10–12 reps)
   - [ ] Øvelse 2: Sittende tåhev med vekt (3 x 12–15 reps)
   - [ ] Øvelse 3: Eksentrisk senkning over trappetrinn (3 x 10 reps)
   - *Notater:* _____________________________________________
-- 💤 *Tirsdag 15. september:* Hviledag / restitusjon
-- [ ] **Onsdag 16. september (Økt 3):**
+- 💤 *Fredag 18. september:* Hviledag / restitusjon
+- [ ] **Lørdag 19. september (Økt 3):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (3 x 10–12 reps)
   - [ ] Øvelse 2: Sittende tåhev med vekt (3 x 12–15 reps)
   - [ ] Øvelse 3: Eksentrisk senkning over trappetrinn (3 x 10 reps)
   - *Notater:* _____________________________________________
-- 💤 *Torsdag 17. september:* Hviledag / restitusjon
-- [ ] **Fredag 18. september (Økt 4):**
+- 💤 *Søndag 20. september:* Hviledag / restitusjon
+- [ ] **Mandag 21. september (Økt 4):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (3 x 10–12 reps)
   - [ ] Øvelse 2: Sittende tåhev med vekt (3 x 12–15 reps)
   - [ ] Øvelse 3: Eksentrisk senkning over trappetrinn (3 x 10 reps)
@@ -73,53 +73,53 @@
 
 ---
 
-### Uke 25 (19. september – 25. september)
+### Uke 25 (22. september – 28. september)
 *Mål: Progressiv motstand – øk vekt i ryggsekk eller legg til manualer.*
 
-- 💤 *Lørdag 19. september:* Hviledag / restitusjon
-- [ ] **Søndag 20. september (Økt 5):**
+- 💤 *Tirsdag 22. september:* Hviledag / restitusjon
+- [ ] **Onsdag 23. september (Økt 5):**
   - [ ] Øvelse 1: Stående tåhev på ett ben m/ekstra vekt (3–4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/økt belastning (3 x 12 reps)
   - [ ] Øvelse 3: Eksentrisk hælsenkning på ett ben (3 x 10–12 reps)
   - *Notater:* _____________________________________________
-- 💤 *Mandag 21. september:* Hviledag / restitusjon
-- [ ] **Tirsdag 22. september (Økt 6):**
+- 💤 *Torsdag 24. september:* Hviledag / restitusjon
+- [ ] **Fredag 25. september (Økt 6):**
   - [ ] Øvelse 1: Stående tåhev på ett ben m/ekstra vekt (3–4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/økt belastning (3 x 12 reps)
   - [ ] Øvelse 3: Eksentrisk hælsenkning på ett ben (3 x 10–12 reps)
   - *Notater:* _____________________________________________
-- 💤 *Onsdag 23. september:* Hviledag / restitusjon
-- [ ] **Torsdag 24. september (Økt 7):**
+- 💤 *Lørdag 26. september:* Hviledag / restitusjon
+- [ ] **Søndag 27. september (Økt 7):**
   - [ ] Øvelse 1: Stående tåhev på ett ben m/ekstra vekt (3–4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/økt belastning (3 x 12 reps)
   - [ ] Øvelse 3: Eksentrisk hælsenkning på ett ben (3 x 10–12 reps)
   - *Notater:* _____________________________________________
-- 💤 *Fredag 25. september:* Hviledag / restitusjon
+- 💤 *Mandag 28. september:* Hviledag / restitusjon
 
 ---
 
-### Uke 26 (26. september – 2. oktober)
+### Uke 26 (29. september – 5. oktober)
 *Mål: Heavy Slow Resistance (HSR) og koordinasjon/balanse.*
 
-- [ ] **Lørdag 26. september (Økt 8):**
+- [ ] **Tirsdag 29. september (Økt 8):**
   - [ ] Øvelse 1: Tung stående tåhev på ett ben (4 x 8 reps, 3s opp / 3s ned)
   - [ ] Øvelse 2: Sittende tåhev med progressiv motstand (3–4 x 10–12 reps)
   - [ ] Øvelse 3: Eksentrisk senkning + Balansepute (3 x 10 reps + 3 x 45s balanse)
   - *Notater:* _____________________________________________
-- 💤 *Søndag 27. september:* Hviledag / restitusjon
-- [ ] **Mandag 28. september (Økt 9):**
+- 💤 *Onsdag 30. september:* Hviledag / restitusjon
+- [ ] **Torsdag 1. oktober (Økt 9):**
   - [ ] Øvelse 1: Tung stående tåhev på ett ben (4 x 8 reps)
   - [ ] Øvelse 2: Sittende tåhev med motstand (3–4 x 10–12 reps)
   - [ ] Øvelse 3: Eksentrisk senkning + Balansepute (3 x 10 reps + 3 x 45s balanse)
   - *Notater:* _____________________________________________
-- 💤 *Tirsdag 29. september:* Hviledag / restitusjon
-- [ ] **Onsdag 30. september (Økt 10):**
+- 💤 *Fredag 2. oktober:* Hviledag / restitusjon
+- [ ] **Lørdag 3. oktober (Økt 10):**
   - [ ] Øvelse 1: Tung stående tåhev på ett ben (4 x 8 reps)
   - [ ] Øvelse 2: Sittende tåhev med motstand (3–4 x 10–12 reps)
   - [ ] Øvelse 3: Eksentrisk senkning + Balansepute (3 x 10 reps + 3 x 45s balanse)
   - *Notater:* _____________________________________________
-- 💤 *Torsdag 1. oktober:* Hviledag / restitusjon
-- [ ] **Fredag 2. oktober (Økt 11):**
+- 💤 *Søndag 4. oktober:* Hviledag / restitusjon
+- [ ] **Mandag 5. oktober (Økt 11):**
   - [ ] Øvelse 1: Tung stående tåhev på ett ben (4 x 8 reps)
   - [ ] Øvelse 2: Sittende tåhev med motstand (3–4 x 10–12 reps)
   - [ ] Øvelse 3: Eksentrisk senkning + Balansepute (3 x 10 reps + 3 x 45s balanse)
@@ -127,35 +127,35 @@
 
 ---
 
-### Uke 27/28 (3. oktober – 12. oktober)
+### Uke 27/28 (6. oktober – 15. oktober)
 *Mål: Test av styrkesymmetri og forberedelse til neste fase.*
 
-- 💤 *Lørdag 3. oktober:* Hviledag / restitusjon
-- [ ] **Søndag 4. oktober (Økt 12):**
+- 💤 *Tirsdag 6. oktober:* Hviledag / restitusjon
+- [ ] **Onsdag 7. oktober (Økt 12):**
   - [ ] Øvelse 1: Stående tåhev på ett ben – styrketest & kvalitet (4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/toppbelastning (4 x 10 reps)
   - [ ] Øvelse 3: Eksentrisk senkning / forberedende sprett (3 x 10–12 reps)
   - *Notater:* _____________________________________________
-- 💤 *Mandag 5. oktober:* Hviledag / restitusjon
-- [ ] **Tirsdag 6. oktober (Økt 13):**
+- 💤 *Torsdag 8. oktober:* Hviledag / restitusjon
+- [ ] **Fredag 9. oktober (Økt 13):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/toppbelastning (4 x 10 reps)
   - [ ] Øvelse 3: Eksentrisk senkning / forberedende sprett (3 x 10–12 reps)
   - *Notater:* _____________________________________________
-- 💤 *Onsdag 7. oktober:* Hviledag / restitusjon
-- [ ] **Torsdag 8. oktober (Økt 14):**
+- 💤 *Lørdag 10. oktober:* Hviledag / restitusjon
+- [ ] **Søndag 11. oktober (Økt 14):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/toppbelastning (4 x 10 reps)
   - [ ] Øvelse 3: Eksentrisk senkning / forberedende sprett (3 x 10–12 reps)
   - *Notater:* _____________________________________________
-- 💤 *Fredag 9. oktober:* Hviledag / restitusjon
-- [ ] **Lørdag 10. oktober (Økt 15):**
+- 💤 *Mandag 12. oktober:* Hviledag / restitusjon
+- [ ] **Tirsdag 13. oktober (Økt 15):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/toppbelastning (4 x 10 reps)
   - [ ] Øvelse 3: Eksentrisk senkning / forberedende sprett (3 x 10–12 reps)
   - *Notater:* _____________________________________________
-- 💤 *Søndag 11. oktober:* Hviledag / restitusjon
-- [ ] **Mandag 12. oktober (Økt 16 – Siste økt i denne 4-ukers perioden!):**
+- 💤 *Onsdag 14. oktober:* Hviledag / restitusjon
+- [ ] **Torsdag 15. oktober (Økt 16 – Siste økt i denne 4-ukers perioden!):**
   - [ ] Øvelse 1: Stående tåhev på ett ben (4 x 8–10 reps)
   - [ ] Øvelse 2: Sittende tåhev m/toppbelastning (4 x 10 reps)
   - [ ] Øvelse 3: Eksentrisk senkning / evaluering (3 x 10–12 reps)

@@ -1,6 +1,6 @@
 /**
  * app.js
- * Hovedapplikasjon for Akilles Senerehabilitering Treningskalender
+ * Forenklet og kompakt treningsapplikasjon for Akilles Senerehabilitering
  */
 
 import {
@@ -8,7 +8,7 @@ import {
   calculateStats,
   isDayFullyCompleted,
   formatDateKey,
-  getMotivationalMessage,
+  formatNorwegianDate,
   DEFAULT_EXERCISES
 } from './tracker-core.js';
 
@@ -22,12 +22,12 @@ let state = {
   notes: {},
   customWeeklyExercises: {},
   theme: 'light',
-  activeFilter: 'all'
+  selectedDateKey: null
 };
 
-// Start- og sluttdatoer for perioden (som spesifisert av bruker)
-const START_DATE = '2026-09-12';
-const END_DATE = '2026-10-12';
+// Start- og sluttdatoer for perioden (Starter tirsdag 15. september)
+const START_DATE = '2026-09-15';
+const END_DATE = '2026-10-15';
 const START_REHAB_WEEK = 24;
 
 let currentPlan = null;
@@ -59,7 +59,7 @@ function saveState() {
 }
 
 /**
- * Initialiserer kalenderplan og render
+ * Initialiserer appen
  */
 function init() {
   loadState();
@@ -71,10 +71,20 @@ function init() {
   // Bygg planen
   rebuildPlan();
 
-  // Sett opp event listeners
-  setupEventListeners();
+  // Bestem innledende valgt dag
+  const todayKey = formatDateKey(new Date());
+  const foundToday = currentPlan.days.find(d => d.dateKey === todayKey);
+  
+  if (state.selectedDateKey && currentPlan.days.some(d => d.dateKey === state.selectedDateKey)) {
+    // Behold lagret valgt dag
+  } else if (foundToday) {
+    state.selectedDateKey = foundToday.dateKey;
+  } else {
+    // Standard er første dag i perioden (15. sep)
+    state.selectedDateKey = currentPlan.days[0].dateKey;
+  }
 
-  // Render alt
+  setupEventListeners();
   renderAll();
 }
 
@@ -83,7 +93,7 @@ function rebuildPlan() {
 }
 
 /**
- * Påfør valgt tema
+ * Påfør tema
  */
 function applyTheme(theme) {
   state.theme = theme;
@@ -92,10 +102,10 @@ function applyTheme(theme) {
 }
 
 /**
- * Setter opp lyttere for knapper og kontroller
+ * Event listeners
  */
 function setupEventListeners() {
-  // Tema-bryter
+  // Tema-veksler
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
@@ -104,19 +114,23 @@ function setupEventListeners() {
     });
   }
 
-  // Utskriftsknapp
-  const printBtn = document.getElementById('printBtn');
-  if (printBtn) {
-    printBtn.addEventListener('click', () => {
-      window.print();
+  // Info toggle / åpne prinsipper
+  const infoToggleBtn = document.getElementById('infoToggleBtn');
+  const principlesAccordion = document.getElementById('principlesAccordion');
+  if (infoToggleBtn && principlesAccordion) {
+    infoToggleBtn.addEventListener('click', () => {
+      principlesAccordion.open = !principlesAccordion.open;
+      if (principlesAccordion.open) {
+        principlesAccordion.scrollIntoView({ behavior: 'smooth' });
+      }
     });
   }
 
-  // Nullstill-knapp
+  // Nullstill avkrysninger
   const resetBtn = document.getElementById('resetCheckboxesBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      if (confirm('Er du sikker på at du vil nullstille alle avkrysninger i treningsplanen?')) {
+      if (confirm('Vil du nullstille alle avkrysninger i treningsplanen?')) {
         state.completedDays = {};
         state.completedExercises = {};
         state.notes = {};
@@ -126,18 +140,56 @@ function setupEventListeners() {
     });
   }
 
-  // Filter-knapper
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.activeFilter = btn.dataset.filter;
-      renderCalendar();
+  // Dag-velger knapper
+  const prevDayBtn = document.getElementById('prevDayBtn');
+  if (prevDayBtn) {
+    prevDayBtn.addEventListener('click', () => {
+      stepDay(-1);
     });
-  });
+  }
+
+  const nextDayBtn = document.getElementById('nextDayBtn');
+  if (nextDayBtn) {
+    nextDayBtn.addEventListener('click', () => {
+      stepDay(1);
+    });
+  }
+
+  const todayJumpBtn = document.getElementById('todayJumpBtn');
+  if (todayJumpBtn) {
+    todayJumpBtn.addEventListener('click', () => {
+      const todayKey = formatDateKey(new Date());
+      const hasToday = currentPlan.days.find(d => d.dateKey === todayKey);
+      if (hasToday) {
+        selectDate(todayKey);
+      } else {
+        // Hvis i dag er utenfor intervallet, velg dag 1
+        selectDate(currentPlan.days[0].dateKey);
+      }
+    });
+  }
 
   // Modal for tilpasning av øvelser
+  setupModalListeners();
+}
+
+function stepDay(offset) {
+  const currentIndex = currentPlan.days.findIndex(d => d.dateKey === state.selectedDateKey);
+  if (currentIndex === -1) return;
+  const newIndex = currentIndex + offset;
+  if (newIndex >= 0 && newIndex < currentPlan.days.length) {
+    selectDate(currentPlan.days[newIndex].dateKey);
+  }
+}
+
+function selectDate(dateKey) {
+  state.selectedDateKey = dateKey;
+  saveState();
+  renderHeatmap();
+  renderSelectedDayView();
+}
+
+function setupModalListeners() {
   const editExercisesBtn = document.getElementById('editExercisesBtn');
   const exerciseModal = document.getElementById('exerciseModal');
   const closeModalBtn = document.getElementById('closeModalBtn');
@@ -170,7 +222,9 @@ function setupEventListeners() {
     restoreDefaultBtn.addEventListener('click', () => {
       const weekIdx = parseInt(modalWeekSelect.value, 10);
       if (confirm(`Vil du tilbakestille øvelsene for uke ${START_REHAB_WEEK + weekIdx} til standard?`)) {
-        delete state.customWeeklyExercises[weekIdx];
+        if (state.customWeeklyExercises) {
+          delete state.customWeeklyExercises[weekIdx];
+        }
         saveState();
         rebuildPlan();
         populateModalExercises(weekIdx);
@@ -180,15 +234,12 @@ function setupEventListeners() {
   }
 }
 
-/**
- * Fyller ut øvelsesskjemaet i modalen for en valgt uke
- */
 function populateModalExercises(weekIndexStr) {
   const weekIdx = parseInt(weekIndexStr, 10);
   const container = document.getElementById('modalExercisesForm');
   if (!container) return;
 
-  const currentExs = state.customWeeklyExercises[weekIdx] || DEFAULT_EXERCISES[Math.min(weekIdx, 3)];
+  const currentExs = (state.customWeeklyExercises && state.customWeeklyExercises[weekIdx]) || DEFAULT_EXERCISES[Math.min(weekIdx, 3)];
 
   container.innerHTML = '';
   currentExs.forEach((ex, idx) => {
@@ -201,21 +252,18 @@ function populateModalExercises(weekIndexStr) {
         <input type="text" class="modal-ex-name" data-idx="${idx}" value="${escapeHtml(ex.name)}" />
       </div>
       <div class="form-group">
-        <label>Mål / Sett x Repetisjoner / Belastning:</label>
+        <label>Mål / Sett x Repetisjoner:</label>
         <input type="text" class="modal-ex-target" data-idx="${idx}" value="${escapeHtml(ex.target)}" />
       </div>
       <div class="form-group">
-        <label>Instruksjon / Tips / Fokusområde:</label>
-        <textarea class="modal-ex-desc" data-idx="${idx}" rows="2">${escapeHtml(ex.description)}</textarea>
+        <label>Instruksjon / Tips:</label>
+        <input type="text" class="modal-ex-desc" data-idx="${idx}" value="${escapeHtml(ex.description)}" />
       </div>
     `;
     container.appendChild(card);
   });
 }
 
-/**
- * Lagrer endringer fra modalen inn i state
- */
 function saveModalExercises(weekIndexStr) {
   const weekIdx = parseInt(weekIndexStr, 10);
   const names = document.querySelectorAll('.modal-ex-name');
@@ -239,217 +287,192 @@ function saveModalExercises(weekIndexStr) {
 }
 
 /**
- * Hovedrender-funksjon
+ * Hovedrender
  */
 function renderAll() {
-  renderStats();
-  renderCalendar();
+  renderHeaderStats();
+  renderHeatmap();
+  renderSelectedDayView();
 }
 
 /**
- * Oppdaterer statistikk- og fremdriftsseksjonen
+ * Oppdaterer topplinjestatistikk
  */
-function renderStats() {
+function renderHeaderStats() {
   const stats = calculateStats(currentPlan, state);
-
-  // Antall fullførte
-  const completedCountEl = document.getElementById('completedCount');
-  if (completedCountEl) {
-    completedCountEl.textContent = `${stats.completedWorkouts} / ${stats.totalWorkouts}`;
+  const label = document.getElementById('compactProgressLabel');
+  if (label) {
+    label.textContent = `${stats.completedWorkouts} av ${stats.totalWorkouts} fullført (${stats.percentage}%)`;
   }
-
-  // Prosent
-  const completedPercentageEl = document.getElementById('completedPercentage');
-  if (completedPercentageEl) {
-    completedPercentageEl.textContent = `${stats.percentage}% av perioden`;
-  }
-
-  // Gjenstående
-  const remainingCountEl = document.getElementById('remainingCount');
-  if (remainingCountEl) {
-    remainingCountEl.textContent = `${stats.remainingWorkouts}`;
-  }
-
-  // Streak
-  const currentStreakEl = document.getElementById('currentStreak');
-  if (currentStreakEl) {
-    currentStreakEl.textContent = `${stats.maxStreak} ${stats.maxStreak === 1 ? 'økt' : 'økter'}`;
-  }
-
-  // Fremdriftslinje
-  const progressFillEl = document.getElementById('progressFill');
-  const progressTextEl = document.getElementById('progressText');
-  if (progressFillEl && progressTextEl) {
-    progressFillEl.style.width = `${stats.percentage}%`;
-    progressTextEl.textContent = `${stats.percentage}% fullført (${stats.completedWorkouts} av ${stats.totalWorkouts} økter)`;
-  }
-
-  // Motivasjonstekst
-  const motivationTextEl = document.getElementById('motivationText');
-  if (motivationTextEl) {
-    motivationTextEl.textContent = getMotivationalMessage(stats.percentage);
-  }
-
-  // Neste treningsdag
-  renderNextWorkoutInfo();
 }
 
 /**
- * Viser informasjon om neste ufullførte treningsdag
+ * Git commit-style heatmap rutenett
  */
-function renderNextWorkoutInfo() {
-  const nextWorkoutDayEl = document.getElementById('nextWorkoutDay');
-  const daysUntilNextEl = document.getElementById('daysUntilNext');
-  if (!nextWorkoutDayEl || !daysUntilNextEl) return;
+function renderHeatmap() {
+  const grid = document.getElementById('heatmapGrid');
+  if (!grid) return;
 
-  const workoutDays = currentPlan.days.filter(d => d.isWorkoutDay);
-  const nextDay = workoutDays.find(d => !isDayFullyCompleted(d, state));
-
-  if (!nextDay) {
-    nextWorkoutDayEl.textContent = 'Fullført! 🎉';
-    daysUntilNextEl.textContent = 'Alle 16 økter er i boks!';
-    return;
-  }
-
-  nextWorkoutDayEl.textContent = nextDay.formattedDateShort;
-
+  grid.innerHTML = '';
   const todayKey = formatDateKey(new Date());
-  if (nextDay.dateKey === todayKey) {
-    daysUntilNextEl.textContent = 'Dagens økt! 💪';
-  } else if (nextDay.dateKey < todayKey) {
-    daysUntilNextEl.textContent = 'Planlagt økt (klar for avkrysning)';
-  } else {
-    daysUntilNextEl.textContent = `Økt #${nextDay.workoutNumber}`;
-  }
-}
 
-/**
- * Bygger opp kalenderen og ukene
- */
-function renderCalendar() {
-  const container = document.getElementById('calendarContainer');
-  if (!container) return;
+  currentPlan.days.forEach(day => {
+    const isCompleted = isDayFullyCompleted(day, state);
+    const isSelected = day.dateKey === state.selectedDateKey;
+    const isToday = day.dateKey === todayKey;
 
-  container.innerHTML = '';
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'heat-box';
+    cell.dataset.dateKey = day.dateKey;
 
-  const filter = state.activeFilter;
-
-  currentPlan.weeks.forEach((week, weekIdx) => {
-    // Sjekk filter
-    if (filter === 'week-0' && weekIdx !== 0) return;
-    if (filter === 'week-1' && weekIdx !== 1) return;
-    if (filter === 'week-2' && weekIdx !== 2) return;
-    if (filter === 'week-3' && weekIdx < 3) return;
-
-    // Filtrer dager innenfor uken
-    let daysToShow = week.days;
-    if (filter === 'workout-only') {
-      daysToShow = week.days.filter(d => d.isWorkoutDay);
-      if (daysToShow.length === 0) return;
+    // Bestem statusklasse
+    if (day.isWorkoutDay) {
+      if (isCompleted) {
+        cell.classList.add('status-completed');
+      } else {
+        cell.classList.add('status-workout');
+      }
+    } else {
+      cell.classList.add('status-rest');
     }
 
-    // Uke-wrapper
-    const weekEl = document.createElement('div');
-    weekEl.className = 'week-group';
+    if (isSelected) {
+      cell.classList.add('is-selected');
+    }
+    if (isToday) {
+      cell.classList.add('is-today');
+    }
 
-    // Beregn ukesfullføring
-    const weekWorkoutDays = week.days.filter(d => d.isWorkoutDay);
-    const weekCompletedDays = weekWorkoutDays.filter(d => isDayFullyCompleted(d, state));
-    const isWeekDone = weekWorkoutDays.length > 0 && weekCompletedDays.length === weekWorkoutDays.length;
-
-    // Uke-header
-    weekEl.innerHTML = `
-      <div class="week-header">
-        <div class="week-title-area">
-          <h2 class="week-title">${week.title}</h2>
-          <span class="week-badge ${isWeekDone ? 'completed' : ''}">
-            ${isWeekDone ? '✅ Uke fullført!' : `${weekCompletedDays.length} av ${weekWorkoutDays.length} økter`}
-          </span>
-        </div>
-      </div>
-      <div class="week-days-grid" id="weekGrid-${weekIdx}"></div>
+    // Innhold i firkanten: kort ukedag og dagnummer (f.eks. Ti 15)
+    const dayShortNor = day.dayNameShort.slice(0, 2);
+    cell.innerHTML = `
+      <span class="heat-day">${dayShortNor}</span>
+      <span class="heat-num">${day.dayNumber}</span>
+      ${isCompleted ? '<span class="heat-check">✓</span>' : ''}
     `;
 
-    container.appendChild(weekEl);
+    // Tooltip / tittel for firkanten
+    let tooltip = `${day.formattedDate}: `;
+    if (day.isWorkoutDay) {
+      tooltip += isCompleted ? `Økt #${day.workoutNumber} (Fullført ✓)` : `Økt #${day.workoutNumber} (Planlagt)`;
+    } else {
+      tooltip += 'Hviledag / restitusjon';
+    }
+    cell.title = tooltip;
+    cell.setAttribute('aria-label', tooltip);
 
-    // Legg til dager
-    const gridEl = weekEl.querySelector(`#weekGrid-${weekIdx}`);
-    daysToShow.forEach(day => {
-      const card = createDayCard(day);
-      gridEl.appendChild(card);
+    cell.addEventListener('click', () => {
+      selectDate(day.dateKey);
     });
+
+    grid.appendChild(cell);
   });
 }
 
 /**
- * Lager et visuelt kort for en enkelt dag (trening eller hvile)
+ * Viser detaljer og sjekkbokser for aktivt valgt dag
  */
-function createDayCard(day) {
-  const card = document.createElement('div');
-  const isDone = isDayFullyCompleted(day, state);
+function renderSelectedDayView() {
+  const day = currentPlan.days.find(d => d.dateKey === state.selectedDateKey) || currentPlan.days[0];
+  const isCompleted = isDayFullyCompleted(day, state);
+  const todayKey = formatDateKey(new Date());
+  const isToday = day.dateKey === todayKey;
+
+  // Oppdater tittel og undertittel i navbaren
+  const titleEl = document.getElementById('selectedDayTitle');
+  const subEl = document.getElementById('selectedDaySub');
+  const todayChip = document.getElementById('todayJumpBtn');
+
+  if (titleEl) {
+    titleEl.textContent = day.formattedDate;
+  }
+
+  if (subEl) {
+    if (day.isWorkoutDay) {
+      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Økt ${day.workoutNumber} av 16</strong>${isCompleted ? ' · <span class="tag-done">Fullført ✓</span>' : ''}`;
+    } else {
+      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Hviledag / restitusjon</strong>`;
+    }
+  }
+
+  if (todayChip) {
+    if (isToday) {
+      todayChip.classList.add('active-today');
+      todayChip.textContent = 'I dag 📍';
+    } else {
+      todayChip.classList.remove('active-today');
+      todayChip.textContent = 'Gå til i dag';
+    }
+  }
+
+  // Deaktiver forrige/neste-knapp dersom vi er i ytterkant
+  const dayIndex = currentPlan.days.findIndex(d => d.dateKey === day.dateKey);
+  const prevBtn = document.getElementById('prevDayBtn');
+  const nextBtn = document.getElementById('nextDayBtn');
+  if (prevBtn) prevBtn.disabled = dayIndex === 0;
+  if (nextBtn) nextBtn.disabled = dayIndex === currentPlan.days.length - 1;
+
+  // Render kortets innhold
+  const card = document.getElementById('dayActionCard');
+  if (!card) return;
 
   if (day.isWorkoutDay) {
-    card.className = `day-card workout-day ${isDone ? 'completed' : ''}`;
-    card.dataset.dateKey = day.dateKey;
+    const dayExs = (state.completedExercises && state.completedExercises[day.dateKey]) || {};
+    const note = (state.notes && state.notes[day.dateKey]) || '';
 
-    const dayNotes = state.notes[day.dateKey] || '';
-    const dayExs = state.completedExercises[day.dateKey] || {};
-
-    let exercisesHtml = '';
+    let rowsHtml = '';
     day.exercises.forEach((ex, idx) => {
-      const isExChecked = !!dayExs[ex.id];
-      exercisesHtml += `
-        <label class="exercise-item ${isExChecked ? 'checked' : ''}" data-ex-id="${ex.id}">
+      const isChecked = !!dayExs[ex.id];
+      rowsHtml += `
+        <label class="compact-ex-row ${isChecked ? 'row-checked' : ''}" data-ex-id="${ex.id}">
           <input 
             type="checkbox" 
-            class="exercise-checkbox" 
+            class="compact-ex-check" 
             data-date-key="${day.dateKey}" 
             data-ex-id="${ex.id}" 
-            ${isExChecked ? 'checked' : ''}
+            ${isChecked ? 'checked' : ''}
           />
-          <div class="exercise-details">
-            <div class="exercise-name">${escapeHtml(ex.name)}</div>
-            <span class="exercise-target">${escapeHtml(ex.target)}</span>
-            <div class="exercise-desc">${escapeHtml(ex.description)}</div>
-          </div>
+          <span class="ex-idx">${idx + 1}</span>
+          <span class="ex-main-text" title="${escapeHtml(ex.description)}">
+            <strong class="ex-name">${escapeHtml(ex.name)}</strong>
+            <span class="ex-target">${escapeHtml(ex.target)}</span>
+          </span>
         </label>
       `;
     });
 
+    card.className = `day-action-card workout ${isCompleted ? 'is-completed' : ''}`;
     card.innerHTML = `
-      <div class="day-card-header">
-        <div class="day-date-info">
-          <span class="day-number-label">${day.formattedDate}</span>
-          <span class="day-date-sub">Uke ${day.rehabWeek} · Dag ${day.index + 1}</span>
-        </div>
-        <span class="day-tag workout-tag">
-          ${isDone ? 'Fullført ✓' : `Økt #${day.workoutNumber}`}
-        </span>
+      <div class="card-action-bar">
+        <button 
+          id="toggleWorkoutDoneBtn" 
+          class="btn-master-toggle ${isCompleted ? 'btn-completed' : 'btn-pending'}"
+          data-date-key="${day.dateKey}"
+        >
+          ${isCompleted ? '✓ Trening fullført!' : '⚡ Marker trening som fullført'}
+        </button>
       </div>
 
-      <div class="day-master-toggle" data-date-key="${day.dateKey}" title="Trykk for å fullføre alle 3 øvelser">
-        <span>${isDone ? '✓ Alle 3 øvelser fullført' : 'Marker hele dagen som fullført'}</span>
-        <span>${isDone ? '🎉' : '👉'}</span>
+      <div class="compact-exercises-list">
+        ${rowsHtml}
       </div>
 
-      <div class="exercises-list">
-        ${exercisesHtml}
-      </div>
-
-      <div class="workout-note-area no-print">
+      <div class="compact-note-line">
         <input 
           type="text" 
-          class="workout-note-input" 
+          id="compactDayNote" 
+          class="compact-note-input" 
           data-date-key="${day.dateKey}" 
-          placeholder="Notat / kg belastning / smerte (0-10)..." 
-          value="${escapeHtml(dayNotes)}"
+          placeholder="Notat for økten (f.eks. +5 kg i sekk, smerte 2/10)..." 
+          value="${escapeHtml(note)}" 
         />
       </div>
     `;
 
-    // Event listeners for treningskort
-    const checkboxes = card.querySelectorAll('.exercise-checkbox');
-    checkboxes.forEach(cb => {
+    // Sjekkboks event handlers
+    const checks = card.querySelectorAll('.compact-ex-check');
+    checks.forEach(cb => {
       cb.addEventListener('change', (e) => {
         const dateKey = e.target.dataset.dateKey;
         const exId = e.target.dataset.exId;
@@ -460,9 +483,9 @@ function createDayCard(day) {
         }
         state.completedExercises[dateKey][exId] = checked;
 
-        // Sjekk om alle øvelser er fullført
-        const allCompleted = day.exercises.every(ex => !!state.completedExercises[dateKey][ex.id]);
-        if (allCompleted) {
+        // Hvis alle øvelsene er krysset av, sett dagen som fullført
+        const allDone = day.exercises.every(ex => !!state.completedExercises[dateKey][ex.id]);
+        if (allDone) {
           state.completedDays[dateKey] = true;
           triggerConfetti();
           triggerVibration();
@@ -471,40 +494,45 @@ function createDayCard(day) {
         }
 
         saveState();
-        renderAll();
+        renderHeaderStats();
+        renderHeatmap();
+        renderSelectedDayView();
       });
     });
 
-    // Master toggle for hele dagen
-    const masterToggle = card.querySelector('.day-master-toggle');
-    if (masterToggle) {
-      masterToggle.addEventListener('click', () => {
-        const currentDone = isDayFullyCompleted(day, state);
-        const newDone = !currentDone;
+    // Marker hele treningen som fullført knapp
+    const masterBtn = card.querySelector('#toggleWorkoutDoneBtn');
+    if (masterBtn) {
+      masterBtn.addEventListener('click', () => {
+        const currentlyDone = isDayFullyCompleted(day, state);
+        const nextDone = !currentlyDone;
 
-        state.completedDays[day.dateKey] = newDone;
+        state.completedDays[day.dateKey] = nextDone;
         if (!state.completedExercises[day.dateKey]) {
           state.completedExercises[day.dateKey] = {};
         }
 
         day.exercises.forEach(ex => {
-          state.completedExercises[day.dateKey][ex.id] = newDone;
+          state.completedExercises[day.dateKey][ex.id] = nextDone;
         });
 
-        if (newDone) {
+        if (nextDone) {
           triggerConfetti();
           triggerVibration();
         }
 
         saveState();
-        renderAll();
+        renderHeaderStats();
+        renderHeatmap();
+        renderSelectedDayView();
       });
     }
 
-    // Notat-felt
-    const noteInput = card.querySelector('.workout-note-input');
+    // Notat-input
+    const noteInput = card.querySelector('#compactDayNote');
     if (noteInput) {
       noteInput.addEventListener('input', (e) => {
+        if (!state.notes) state.notes = {};
         state.notes[day.dateKey] = e.target.value;
         saveState();
       });
@@ -512,28 +540,19 @@ function createDayCard(day) {
 
   } else {
     // Hviledagskort
-    card.className = 'day-card rest-day';
+    card.className = 'day-action-card rest';
     card.innerHTML = `
-      <div class="day-card-header">
-        <div class="day-date-info">
-          <span class="day-number-label">${day.formattedDate}</span>
-          <span class="day-date-sub">Uke ${day.rehabWeek} · Dag ${day.index + 1}</span>
+      <div class="rest-row">
+        <span class="rest-badge-icon">🌿</span>
+        <div class="rest-row-body">
+          <div class="rest-row-title">Hviledag & Superkompensasjon</div>
+          <div class="rest-row-text">
+            Senen restituerer og danner nytt kollagen i 36–48 timer etter forrige økt. Ingen tung belastning i dag.
+          </div>
         </div>
-        <span class="day-tag rest-tag">Hviledag</span>
-      </div>
-
-      <div class="rest-day-content">
-        <div class="rest-icon">🧘‍♂️</div>
-        <div class="rest-title">Restitusjon & Senetilheling</div>
-        <p class="rest-desc">
-          Superkompensasjon pågår. Kollagenfibrene i akillessenen styrkes i hvilefasen. 
-          Gå rolige turer og unngå eksplosiv belastning.
-        </p>
       </div>
     `;
   }
-
-  return card;
 }
 
 /**
@@ -550,7 +569,7 @@ function escapeHtml(str) {
 }
 
 /**
- * Enkel og morsom konfetti-animasjon på canvas
+ * Konfetti ved fullføring
  */
 function triggerConfetti() {
   const canvas = document.getElementById('confettiCanvas');
@@ -561,15 +580,15 @@ function triggerConfetti() {
   canvas.height = window.innerHeight;
 
   const particles = [];
-  const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6'];
+  const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
 
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 45; i++) {
     particles.push({
-      x: window.innerWidth / 2 + (Math.random() - 0.5) * 300,
-      y: window.innerHeight / 3 + (Math.random() - 0.5) * 150,
-      vx: (Math.random() - 0.5) * 12,
-      vy: Math.random() * -10 - 4,
-      size: Math.random() * 8 + 4,
+      x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+      y: window.innerHeight / 3,
+      vx: (Math.random() - 0.5) * 10,
+      vy: Math.random() * -8 - 3,
+      size: Math.random() * 6 + 4,
       color: colors[Math.floor(Math.random() * colors.length)],
       rotation: Math.random() * 360,
       rotSpeed: (Math.random() - 0.5) * 10,
@@ -588,7 +607,7 @@ function triggerConfetti() {
       p.y += p.vy;
       p.vy += p.gravity;
       p.rotation += p.rotSpeed;
-      p.alpha -= 0.012;
+      p.alpha -= 0.015;
 
       if (p.alpha > 0) {
         active = true;
@@ -598,7 +617,7 @@ function triggerConfetti() {
         ctx.rotate((p.rotation * Math.PI) / 180);
         ctx.fillStyle = p.color;
         ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-        ctx.restore();
+        ctx.restore;
       }
     });
 
@@ -614,17 +633,17 @@ function triggerConfetti() {
 }
 
 /**
- * Enkel haptisk feedback for mobilbruk
+ * Haptisk tilbakemelding
  */
 function triggerVibration() {
   if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
     try {
-      navigator.vibrate([40, 60, 40]);
+      navigator.vibrate([30, 40, 30]);
     } catch (e) {}
   }
 }
 
-// Start appen når DOM er klar
+// Start app
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     init();
@@ -635,13 +654,9 @@ if (document.readyState === 'loading') {
   registerServiceWorker();
 }
 
-/**
- * Registrer Service Worker for PWA og offline-bruk på mobil
- */
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      // Bruk relativ sti til sw.js basert på gjeldende underkatalog (f.eks. GitHub Pages repo path)
       navigator.serviceWorker.register('sw.js').catch((err) => {
         console.log('ServiceWorker registrering feilet:', err);
       });

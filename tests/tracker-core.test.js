@@ -15,10 +15,10 @@ import {
   DEFAULT_EXERCISES
 } from '../tracker-core.js';
 
-test('generatePlan genererer riktig antall dager og uker fra 12. sep til 12. okt', () => {
-  const plan = generatePlan('2026-09-12', '2026-10-12', 24);
+test('generatePlan genererer riktig antall dager og uker fra 15. sep til 15. okt som standard', () => {
+  const plan = generatePlan('2026-09-15', '2026-10-15', 24);
 
-  // 12. sep til 12. okt er 31 dager (19 dager i sep: 12-30 + 12 dager i okt: 1-12)
+  // 15. sep til 15. okt er 31 dager (16 dager i sep: 15-30 + 15 dager i okt: 1-15)
   assert.equal(plan.days.length, 31);
   assert.equal(plan.totalDays, 31);
 
@@ -26,20 +26,22 @@ test('generatePlan genererer riktig antall dager og uker fra 12. sep til 12. okt
   assert.equal(plan.totalWorkoutDays, 16);
   assert.equal(plan.totalRestDays, 15);
 
-  // Første dag er 12. sep og skal være treningsdag
-  assert.equal(plan.days[0].dateKey, '2026-09-12');
+  // Første dag er 15. sep (tirsdag) og skal være treningsdag
+  assert.equal(plan.days[0].dateKey, '2026-09-15');
+  assert.equal(plan.days[0].dayName, 'Tirsdag');
   assert.equal(plan.days[0].isWorkoutDay, true);
   assert.equal(plan.days[0].workoutNumber, 1);
   assert.equal(plan.days[0].exercises.length, 3);
 
-  // Andre dag er 13. sep og skal være hviledag
-  assert.equal(plan.days[1].dateKey, '2026-09-13');
+  // Andre dag er 16. sep (onsdag) og skal være hviledag
+  assert.equal(plan.days[1].dateKey, '2026-09-16');
+  assert.equal(plan.days[1].dayName, 'Onsdag');
   assert.equal(plan.days[1].isWorkoutDay, false);
   assert.equal(plan.days[1].workoutNumber, null);
   assert.equal(plan.days[1].exercises.length, 0);
 
-  // Siste dag er 12. okt og skal være treningsdag (dag 30)
-  assert.equal(plan.days[30].dateKey, '2026-10-12');
+  // Siste dag er 15. okt og skal være treningsdag (dag 30)
+  assert.equal(plan.days[30].dateKey, '2026-10-15');
   assert.equal(plan.days[30].isWorkoutDay, true);
   assert.equal(plan.days[30].workoutNumber, 16);
 
@@ -49,7 +51,7 @@ test('generatePlan genererer riktig antall dager og uker fra 12. sep til 12. okt
 });
 
 test('calculateStats beregner fullførte økter og prosentandel korrekt', () => {
-  const plan = generatePlan('2026-09-12', '2026-10-12', 24);
+  const plan = generatePlan('2026-09-15', '2026-10-15', 24);
   
   // Tom tilstand
   const emptyStats = calculateStats(plan, {});
@@ -57,23 +59,23 @@ test('calculateStats beregner fullførte økter og prosentandel korrekt', () => 
   assert.equal(emptyStats.percentage, 0);
   assert.equal(emptyStats.totalWorkouts, 16);
 
-  // Marker første dag fullført via completedDays
+  // Marker første dag (15. sep) fullført via completedDays
   const state1 = {
     completedDays: {
-      '2026-09-12': true
+      '2026-09-15': true
     }
   };
   const stats1 = calculateStats(plan, state1);
   assert.equal(stats1.completedWorkouts, 1);
   assert.equal(stats1.percentage, 6); // 1 / 16 = 6.25% -> 6%
 
-  // Marker andre treningsdag (14. sep) ved å krysse av alle 3 øvelser
+  // Marker andre treningsdag (17. sep) ved å krysse av alle 3 øvelser
   const state2 = {
     completedDays: {
-      '2026-09-12': true
+      '2026-09-15': true
     },
     completedExercises: {
-      '2026-09-14': {
+      '2026-09-17': {
         'ex-1': true,
         'ex-2': true,
         'ex-3': true
@@ -87,7 +89,7 @@ test('calculateStats beregner fullførte økter og prosentandel korrekt', () => 
   // Delvis fullført økt (kun 2 av 3 øvelser) skal ikke telle som fullført dag hvis ikke eksplisitt markert
   const state3 = {
     completedExercises: {
-      '2026-09-16': {
+      '2026-09-19': {
         'ex-1': true,
         'ex-2': true
       }
@@ -98,15 +100,15 @@ test('calculateStats beregner fullførte økter og prosentandel korrekt', () => 
 });
 
 test('isDayFullyCompleted fungerer for både hele dager og individuelle øvelser', () => {
-  const plan = generatePlan('2026-09-12', '2026-10-12', 24);
-  const day0 = plan.days[0]; // 12. sep
-  const day1 = plan.days[1]; // 13. sep (hviledag)
+  const plan = generatePlan('2026-09-15', '2026-10-15', 24);
+  const day0 = plan.days[0]; // 15. sep
+  const day1 = plan.days[1]; // 16. sep (hviledag)
 
   assert.equal(isDayFullyCompleted(day1, {}), false);
 
   const state = {
     completedExercises: {
-      '2026-09-12': {
+      '2026-09-15': {
         'ex-1': true,
         'ex-2': true,
         'ex-3': true
