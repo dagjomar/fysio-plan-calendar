@@ -144,8 +144,8 @@ export function formatNorwegianDate(date, short = false) {
  * @param {Object} customWeeklyExercises - overstyrte øvelser per ukeindeks
  */
 export function generatePlan(
-  startDateStr = '2026-09-12',
-  endDateStr = '2026-10-12',
+  startDateStr = '2026-09-15',
+  endDateStr = '2026-10-15',
   startRehabWeek = 24,
   customWeeklyExercises = {}
 ) {
