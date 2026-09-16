@@ -571,13 +571,29 @@ function escapeHtml(str) {
 /**
  * Konfetti ved fullføring
  */
+let confettiAnimId = null;
+let confettiSafetyTimeout = null;
+
 function triggerConfetti() {
   const canvas = document.getElementById('confettiCanvas');
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  // Stopp eventuell pågående animasjon og sikkerhetstimer
+  if (confettiAnimId) {
+    cancelAnimationFrame(confettiAnimId);
+    confettiAnimId = null;
+  }
+  if (confettiSafetyTimeout) {
+    clearTimeout(confettiSafetyTimeout);
+    confettiSafetyTimeout = null;
+  }
+
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const particles = [];
   const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
@@ -597,39 +613,57 @@ function triggerConfetti() {
     });
   }
 
-  let animationFrame;
-  function animate() {
+  function cleanUp() {
+    if (confettiAnimId) {
+      cancelAnimationFrame(confettiAnimId);
+      confettiAnimId = null;
+    }
+    if (confettiSafetyTimeout) {
+      clearTimeout(confettiSafetyTimeout);
+      confettiSafetyTimeout = null;
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let active = false;
+  }
 
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += p.gravity;
-      p.rotation += p.rotSpeed;
-      p.alpha -= 0.015;
+  // Sikkerhetsutløp slik at konfetti forsvinner selv ved bakgrunnsfane
+  confettiSafetyTimeout = setTimeout(cleanUp, 3000);
 
-      if (p.alpha > 0) {
-        active = true;
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.translate(p.x, p.y);
-        ctx.rotate((p.rotation * Math.PI) / 180);
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-        ctx.restore;
-      }
-    });
-
-    if (active) {
-      animationFrame = requestAnimationFrame(animate);
-    } else {
-      cancelAnimationFrame(animationFrame);
+  function animate() {
+    try {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let active = false;
+
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.rotation += p.rotSpeed;
+        p.alpha -= 0.015;
+
+        if (p.alpha > 0) {
+          active = true;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        }
+      });
+
+      if (active) {
+        confettiAnimId = requestAnimationFrame(animate);
+      } else {
+        cleanUp();
+      }
+    } catch (err) {
+      console.error('Konfetti animasjonsfeil:', err);
+      cleanUp();
     }
   }
 
-  animate();
+  confettiAnimId = requestAnimationFrame(animate);
 }
 
 /**
