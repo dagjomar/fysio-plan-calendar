@@ -1,5 +1,5 @@
 // sw.js - Service Worker for offline-støtte på mobil
-const CACHE_NAME = 'akilles-fysio-v3';
+const CACHE_NAME = 'akilles-fysio-v4';
 const ASSETS = [
   'index.html',
   'style.css',
