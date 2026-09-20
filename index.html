@@ -49,6 +49,7 @@
           <span class="legend-item"><span class="legend-swatch done"></span> Fullført</span>
           <span class="legend-item"><span class="legend-swatch workout"></span> Trening</span>
           <span class="legend-item"><span class="legend-swatch rest"></span> Hvile</span>
+          <span class="legend-item"><span class="legend-swatch skipped"></span> Hoppet over</span>
         </div>
       </div>
 
@@ -98,6 +99,41 @@
         </div>
       </div>
     </details>
+  </div>
+
+  <!-- Modal for å håndtere hopping over dag -->
+  <div id="skipModal" class="modal-backdrop hidden no-print">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="skipModalTitle">Hopp over dag</h2>
+        <button id="closeSkipModalBtn" class="close-btn" aria-label="Lukk">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro" id="skipModalIntro">
+          Velg hvordan planen skal justeres dersom du hopper over denne dagen:
+        </p>
+        <div class="skip-options-list">
+          <label class="skip-option-label">
+            <input type="radio" name="skipOptionRadio" value="shift" checked>
+            <div class="skip-option-content">
+              <strong>Hopp over og forskyv planen videre</strong>
+              <span>Resten av trenings- og hviledagene forskyves slik at neste hviledag blir en treningsdag (annenhver dags rytme bevares).</span>
+            </div>
+          </label>
+          <label class="skip-option-label">
+            <input type="radio" name="skipOptionRadio" value="no-shift">
+            <div class="skip-option-content">
+              <strong>Hopp over uten å forskyve</strong>
+              <span>Dagens økt utgår helt, og resten av dagene forblir som opprinnelig planlagt.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelSkipBtn" class="btn btn-secondary">Avbryt</button>
+        <button id="confirmSkipBtn" class="btn btn-warning">Bekreft hopp over</button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal for å tilpasse ukesøvelser -->

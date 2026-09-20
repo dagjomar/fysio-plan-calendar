@@ -19,6 +19,7 @@ const STORAGE_KEY = 'fysio_plan_akilles_storage_v1';
 let state = {
   completedDays: {},
   completedExercises: {},
+  skippedDays: {},
   notes: {},
   customWeeklyExercises: {},
   theme: 'light',
@@ -89,7 +90,7 @@ function init() {
 }
 
 function rebuildPlan() {
-  currentPlan = generatePlan(START_DATE, END_DATE, START_REHAB_WEEK, state.customWeeklyExercises);
+  currentPlan = generatePlan(START_DATE, END_DATE, START_REHAB_WEEK, state.customWeeklyExercises, state.skippedDays || {});
 }
 
 /**
@@ -130,10 +131,12 @@ function setupEventListeners() {
   const resetBtn = document.getElementById('resetCheckboxesBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      if (confirm('Vil du nullstille alle avkrysninger i treningsplanen?')) {
+      if (confirm('Vil du nullstille alle avkrysninger og overhoppede dager i treningsplanen?')) {
         state.completedDays = {};
         state.completedExercises = {};
+        state.skippedDays = {};
         state.notes = {};
+        rebuildPlan();
         saveState();
         renderAll();
       }
@@ -171,6 +174,8 @@ function setupEventListeners() {
 
   // Modal for tilpasning av øvelser
   setupModalListeners();
+  // Modal for hopping over dager
+  setupSkipModalListeners();
 }
 
 function stepDay(offset) {
@@ -231,6 +236,73 @@ function setupModalListeners() {
         renderAll();
       }
     });
+  }
+}
+
+let pendingSkipDay = null;
+
+function setupSkipModalListeners() {
+  const skipModal = document.getElementById('skipModal');
+  const closeSkipModalBtn = document.getElementById('closeSkipModalBtn');
+  const cancelSkipBtn = document.getElementById('cancelSkipBtn');
+  const confirmSkipBtn = document.getElementById('confirmSkipBtn');
+
+  if (!skipModal) return;
+
+  const closeModal = () => {
+    skipModal.classList.add('hidden');
+    pendingSkipDay = null;
+  };
+
+  if (closeSkipModalBtn) closeSkipModalBtn.addEventListener('click', closeModal);
+  if (cancelSkipBtn) cancelSkipBtn.addEventListener('click', closeModal);
+
+  if (confirmSkipBtn) {
+    confirmSkipBtn.addEventListener('click', () => {
+      if (!pendingSkipDay) return;
+      const selectedRadio = document.querySelector('input[name="skipOptionRadio"]:checked');
+      const skipOption = selectedRadio ? selectedRadio.value : 'shift';
+
+      if (!state.skippedDays) {
+        state.skippedDays = {};
+      }
+      state.skippedDays[pendingSkipDay.dateKey] = skipOption;
+
+      // Fjern fullført status for denne dagen dersom den fantes
+      if (state.completedDays) {
+        delete state.completedDays[pendingSkipDay.dateKey];
+      }
+      if (state.completedExercises) {
+        delete state.completedExercises[pendingSkipDay.dateKey];
+      }
+
+      closeModal();
+      rebuildPlan();
+      saveState();
+      renderAll();
+    });
+  }
+}
+
+function openSkipModal(day) {
+  pendingSkipDay = day;
+  const skipModal = document.getElementById('skipModal');
+  const titleEl = document.getElementById('skipModalTitle');
+  const introEl = document.getElementById('skipModalIntro');
+
+  if (titleEl) {
+    titleEl.textContent = `Hopp over: ${day.formattedDate}`;
+  }
+  if (introEl) {
+    introEl.textContent = `Velg hvordan treningsplanen skal justeres for ${day.formattedDate} (Uke ${day.rehabWeek}, Økt ${day.workoutNumber}):`;
+  }
+
+  // Nullstill til 'shift' som standard
+  const shiftRadio = document.querySelector('input[name="skipOptionRadio"][value="shift"]');
+  if (shiftRadio) shiftRadio.checked = true;
+
+  if (skipModal) {
+    skipModal.classList.remove('hidden');
   }
 }
 
@@ -327,7 +399,9 @@ function renderHeatmap() {
     cell.dataset.dateKey = day.dateKey;
 
     // Bestem statusklasse
-    if (day.isWorkoutDay) {
+    if (day.isSkipped) {
+      cell.classList.add('status-skipped');
+    } else if (day.isWorkoutDay) {
       if (isCompleted) {
         cell.classList.add('status-completed');
       } else {
@@ -349,12 +423,14 @@ function renderHeatmap() {
     cell.innerHTML = `
       <span class="heat-day">${dayShortNor}</span>
       <span class="heat-num">${day.dayNumber}</span>
-      ${isCompleted ? '<span class="heat-check">✓</span>' : ''}
+      ${isCompleted ? '<span class="heat-check">✓</span>' : day.isSkipped ? '<span class="heat-check">✕</span>' : ''}
     `;
 
     // Tooltip / tittel for firkanten
     let tooltip = `${day.formattedDate}: `;
-    if (day.isWorkoutDay) {
+    if (day.isSkipped) {
+      tooltip += day.skipOption === 'shift' ? 'Hoppet over (forsjøv resten)' : 'Hoppet over (ikke forskjøvet)';
+    } else if (day.isWorkoutDay) {
       tooltip += isCompleted ? `Økt #${day.workoutNumber} (Fullført ✓)` : `Økt #${day.workoutNumber} (Planlagt)`;
     } else {
       tooltip += 'Hviledag / restitusjon';
@@ -389,8 +465,11 @@ function renderSelectedDayView() {
   }
 
   if (subEl) {
-    if (day.isWorkoutDay) {
-      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Økt ${day.workoutNumber} av 16</strong>${isCompleted ? ' · <span class="tag-done">Fullført ✓</span>' : ''}`;
+    if (day.isSkipped) {
+      const modeText = day.skipOption === 'shift' ? 'Planen videre er forskjøvet' : 'Ikke forskjøvet';
+      subEl.innerHTML = `Uke ${day.rehabWeek} · <span class="tag-skipped">Hoppet over (${modeText})</span>`;
+    } else if (day.isWorkoutDay) {
+      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Økt ${day.workoutNumber} av ${currentPlan.totalWorkoutDays}</strong>${isCompleted ? ' · <span class="tag-done">Fullført ✓</span>' : ''}`;
     } else {
       subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Hviledag / restitusjon</strong>`;
     }
@@ -417,7 +496,63 @@ function renderSelectedDayView() {
   const card = document.getElementById('dayActionCard');
   if (!card) return;
 
-  if (day.isWorkoutDay) {
+  if (day.isSkipped) {
+    // Hoppet over dag
+    const modeDesc = day.skipOption === 'shift'
+      ? 'Planen videre er forskjøvet slik at neste hviledag ble treningsdag.'
+      : 'Dagen utgikk uten at etterfølgende dager ble flyttet.';
+    const note = (state.notes && state.notes[day.dateKey]) || '';
+
+    card.className = 'day-action-card skipped';
+    card.innerHTML = `
+      <div class="skipped-row">
+        <span class="skipped-badge-icon">⏭️</span>
+        <div class="skipped-row-body">
+          <div class="skipped-row-title">Hoppet over treningsdag</div>
+          <div class="skipped-row-text">
+            ${modeDesc}
+          </div>
+        </div>
+      </div>
+      <div class="card-action-bar">
+        <button id="restoreSkippedDayBtn" class="btn-restore-skipped" data-date-key="${day.dateKey}">
+          ↩️ Angre hopp over (gjenopprett som treningsdag)
+        </button>
+      </div>
+      <div class="compact-note-line">
+        <input 
+          type="text" 
+          id="compactDayNote" 
+          class="compact-note-input" 
+          data-date-key="${day.dateKey}" 
+          placeholder="Notat for dagen (f.eks. sykdom, reise)..." 
+          value="${escapeHtml(note)}" 
+        />
+      </div>
+    `;
+
+    const restoreBtn = card.querySelector('#restoreSkippedDayBtn');
+    if (restoreBtn) {
+      restoreBtn.addEventListener('click', () => {
+        if (state.skippedDays) {
+          delete state.skippedDays[day.dateKey];
+        }
+        rebuildPlan();
+        saveState();
+        renderAll();
+      });
+    }
+
+    const noteInput = card.querySelector('#compactDayNote');
+    if (noteInput) {
+      noteInput.addEventListener('input', (e) => {
+        if (!state.notes) state.notes = {};
+        state.notes[day.dateKey] = e.target.value;
+        saveState();
+      });
+    }
+
+  } else if (day.isWorkoutDay) {
     const dayExs = (state.completedExercises && state.completedExercises[day.dateKey]) || {};
     const note = (state.notes && state.notes[day.dateKey]) || '';
 
@@ -451,6 +586,14 @@ function renderSelectedDayView() {
           data-date-key="${day.dateKey}"
         >
           ${isCompleted ? '✓ Trening fullført!' : '⚡ Marker trening som fullført'}
+        </button>
+        <button 
+          id="openSkipModalBtn" 
+          class="btn-skip-action"
+          data-date-key="${day.dateKey}"
+          title="Hopp over denne dagen"
+        >
+          ⏭️ Hopp over
         </button>
       </div>
 
@@ -525,6 +668,14 @@ function renderSelectedDayView() {
         renderHeaderStats();
         renderHeatmap();
         renderSelectedDayView();
+      });
+    }
+
+    // Åpne hopp over-modal knapp
+    const skipBtn = card.querySelector('#openSkipModalBtn');
+    if (skipBtn) {
+      skipBtn.addEventListener('click', () => {
+        openSkipModal(day);
       });
     }
 

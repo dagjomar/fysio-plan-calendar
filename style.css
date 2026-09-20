@@ -28,6 +28,10 @@
   --heat-done-border: #16a34a;
   --heat-done-text: #ffffff;
 
+  --heat-skipped-bg: #f87171; /* Rødlig/korall for hoppet over */
+  --heat-skipped-border: #ef4444;
+  --heat-skipped-text: #ffffff;
+  
   --border-color: #e2e8f0;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -62,6 +66,10 @@
   --heat-done-bg: #15803d;
   --heat-done-border: #22c55e;
   --heat-done-text: #ffffff;
+
+  --heat-skipped-bg: #991b1b;
+  --heat-skipped-border: #ef4444;
+  --heat-skipped-text: #fecaca;
   
   --border-color: #334155;
 }
@@ -217,6 +225,11 @@ body {
   border: 1px solid var(--heat-rest-border);
 }
 
+.legend-swatch.skipped {
+  background-color: var(--heat-skipped-bg);
+  border: 1px solid var(--heat-skipped-border);
+}
+
 /* Rutenett av dager */
 .heatmap-grid {
   display: grid;
@@ -263,6 +276,13 @@ body {
   background-color: var(--heat-done-bg);
   border-color: var(--heat-done-border);
   color: var(--heat-done-text);
+  font-weight: 700;
+}
+
+.heat-box.status-skipped {
+  background-color: var(--heat-skipped-bg);
+  border-color: var(--heat-skipped-border);
+  color: var(--heat-skipped-text);
   font-weight: 700;
 }
 
@@ -764,6 +784,160 @@ body {
 .btn-primary {
   background: var(--primary);
   color: #fff;
+}
+
+.btn-warning {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-warning:hover {
+  background: #dc2626;
+}
+
+.btn-skip-action {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.btn-skip-action:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+[data-theme="dark"] .btn-skip-action:hover {
+  background: #450a0a;
+  border-color: #ef4444;
+}
+
+.btn-restore-skipped {
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.btn-restore-skipped:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Skip modal opsjoner */
+.skip-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.skip-option-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.skip-option-label:hover {
+  border-color: var(--primary);
+}
+
+.skip-option-label input[type="radio"] {
+  margin-top: 0.2rem;
+  accent-color: var(--primary);
+}
+
+.skip-option-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.skip-option-content strong {
+  font-size: 0.88rem;
+  color: var(--text-main);
+}
+
+.skip-option-content span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.day-action-card.skipped {
+  border-color: #fca5a5;
+  background-color: #fef2f2;
+}
+
+[data-theme="dark"] .day-action-card.skipped {
+  border-color: #991b1b;
+  background-color: #2b1111;
+}
+
+.skipped-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.3rem;
+}
+
+.skipped-badge-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.skipped-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.skipped-row-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.skipped-row-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.tag-skipped {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.card-action-bar {
+  display: flex;
+  gap: 0.45rem;
 }
 
 /* Confetti canvas */
