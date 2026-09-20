@@ -230,6 +230,17 @@ body {
   border: 1px solid var(--heat-skipped-border);
 }
 
+.legend-note-mark {
+  color: #b45309;
+  font-weight: 800;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+[data-theme="dark"] .legend-note-mark {
+  color: #fbbf24;
+}
+
 /* Rutenett av dager */
 .heatmap-grid {
   display: grid;
@@ -316,6 +327,25 @@ body {
   position: absolute;
   top: 1px;
   right: 2px;
+}
+
+.heat-note {
+  font-size: 0.55rem;
+  line-height: 1;
+  position: absolute;
+  bottom: 1px;
+  right: 2px;
+  color: #b45309;
+  font-weight: 800;
+}
+
+.heat-box.status-completed .heat-note,
+.heat-box.status-skipped .heat-note {
+  color: #fef3c7;
+}
+
+[data-theme="dark"] .heat-note {
+  color: #fbbf24;
 }
 
 /* Dagvelger & Navigasjon */
@@ -557,7 +587,20 @@ body {
 
 /* Notatlinje */
 .compact-note-line {
-  margin-top: 0.15rem;
+  margin-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.compact-note-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #b45309;
+}
+
+[data-theme="dark"] .compact-note-label {
+  color: #fbbf24;
 }
 
 .compact-note-input {
@@ -573,7 +616,18 @@ body {
 }
 
 .compact-note-input:focus {
-  border-color: var(--primary);
+  border-color: #d97706;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+.tag-alt-note {
+  color: #b45309;
+  font-weight: 700;
+  font-size: 0.85em;
+}
+
+[data-theme="dark"] .tag-alt-note {
+  color: #fbbf24;
 }
 
 /* Hviledagsvisning i handlingskort */
