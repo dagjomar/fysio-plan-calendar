@@ -16,6 +16,9 @@ Interaktiv treningsplan og kalender for opptrening etter akillesseneruptur, spes
     - **Hopp over og forskyv planen videre:** Rekalkulerer resten av planen slik at neste hviledag blir en treningsdag og annenhver-dag-rytmen bevares.
     - **Hopp over uten å forskyve:** Dagens økt utgår helt, og resten av dagene forblir som opprinnelig planlagt.
     - Mulighet for å angre / tilbakestille overhoppet dag når som helst.
+  - **Alternativ trening / notat** på alle dager (trening, hvile og hoppet over):
+    - Skriv inn en kort kommentar (f.eks. «syklet 30 min» på en hviledag, eller ekstra aktivitet i tillegg til økten).
+    - Dager med notat får en ★ i kalenderrutenettet, slik at de er enkle å se.
   - Tilpasning av øvelser uke for uke etter avtale med fysioterapeut.
   - Lyst og mørkt tema, samt A4-utskriftsvennlig visning.
 - **Treningsplan i Markdown (`TRENINGSPLAN.md`)**:

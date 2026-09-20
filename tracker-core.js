@@ -333,6 +333,14 @@ export function isDayFullyCompleted(day, state = {}) {
 }
 
 /**
+ * Sjekker om en dag har notat / alternativ trening (ikke-tom tekst)
+ */
+export function hasDayNote(dateKey, state = {}) {
+  const note = state.notes && state.notes[dateKey];
+  return typeof note === 'string' && note.trim().length > 0;
+}
+
+/**
  * Hjelper for å hente motiverende sitat eller tips basert på fremdrift
  */
 export function getMotivationalMessage(percentage) {

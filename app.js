@@ -7,6 +7,7 @@ import {
   generatePlan,
   calculateStats,
   isDayFullyCompleted,
+  hasDayNote,
   formatDateKey,
   formatNorwegianDate,
   DEFAULT_EXERCISES
@@ -418,12 +419,15 @@ function renderHeatmap() {
       cell.classList.add('is-today');
     }
 
+    const hasNote = hasDayNote(day.dateKey, state);
+
     // Innhold i firkanten: kort ukedag og dagnummer (f.eks. Ti 15)
     const dayShortNor = day.dayNameShort.slice(0, 2);
     cell.innerHTML = `
       <span class="heat-day">${dayShortNor}</span>
       <span class="heat-num">${day.dayNumber}</span>
       ${isCompleted ? '<span class="heat-check">✓</span>' : day.isSkipped ? '<span class="heat-check">✕</span>' : ''}
+      ${hasNote ? '<span class="heat-note" title="Alternativ trening / notat">★</span>' : ''}
     `;
 
     // Tooltip / tittel for firkanten
@@ -434,6 +438,10 @@ function renderHeatmap() {
       tooltip += isCompleted ? `Økt #${day.workoutNumber} (Fullført ✓)` : `Økt #${day.workoutNumber} (Planlagt)`;
     } else {
       tooltip += 'Hviledag / restitusjon';
+    }
+    if (hasNote) {
+      const notePreview = String(state.notes[day.dateKey]).trim();
+      tooltip += ` · ★ ${notePreview.length > 60 ? notePreview.slice(0, 57) + '…' : notePreview}`;
     }
     cell.title = tooltip;
     cell.setAttribute('aria-label', tooltip);
@@ -465,13 +473,16 @@ function renderSelectedDayView() {
   }
 
   if (subEl) {
+    const noteTag = hasDayNote(day.dateKey, state)
+      ? ' · <span class="tag-alt-note">★ Alternativ</span>'
+      : '';
     if (day.isSkipped) {
       const modeText = day.skipOption === 'shift' ? 'Planen videre er forskjøvet' : 'Ikke forskjøvet';
-      subEl.innerHTML = `Uke ${day.rehabWeek} · <span class="tag-skipped">Hoppet over (${modeText})</span>`;
+      subEl.innerHTML = `Uke ${day.rehabWeek} · <span class="tag-skipped">Hoppet over (${modeText})</span>${noteTag}`;
     } else if (day.isWorkoutDay) {
-      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Økt ${day.workoutNumber} av ${currentPlan.totalWorkoutDays}</strong>${isCompleted ? ' · <span class="tag-done">Fullført ✓</span>' : ''}`;
+      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Økt ${day.workoutNumber} av ${currentPlan.totalWorkoutDays}</strong>${isCompleted ? ' · <span class="tag-done">Fullført ✓</span>' : ''}${noteTag}`;
     } else {
-      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Hviledag / restitusjon</strong>`;
+      subEl.innerHTML = `Uke ${day.rehabWeek} · <strong>Hviledag / restitusjon</strong>${noteTag}`;
     }
   }
 
@@ -501,7 +512,6 @@ function renderSelectedDayView() {
     const modeDesc = day.skipOption === 'shift'
       ? 'Planen videre er forskjøvet slik at neste hviledag ble treningsdag.'
       : 'Dagen utgikk uten at etterfølgende dager ble flyttet.';
-    const note = (state.notes && state.notes[day.dateKey]) || '';
 
     card.className = 'day-action-card skipped';
     card.innerHTML = `
@@ -519,16 +529,7 @@ function renderSelectedDayView() {
           ↩️ Angre hopp over (gjenopprett som treningsdag)
         </button>
       </div>
-      <div class="compact-note-line">
-        <input 
-          type="text" 
-          id="compactDayNote" 
-          class="compact-note-input" 
-          data-date-key="${day.dateKey}" 
-          placeholder="Notat for dagen (f.eks. sykdom, reise)..." 
-          value="${escapeHtml(note)}" 
-        />
-      </div>
+      ${buildAltNoteHtml(day, 'Notat for dagen (f.eks. sykdom, reise)...')}
     `;
 
     const restoreBtn = card.querySelector('#restoreSkippedDayBtn');
@@ -543,18 +544,10 @@ function renderSelectedDayView() {
       });
     }
 
-    const noteInput = card.querySelector('#compactDayNote');
-    if (noteInput) {
-      noteInput.addEventListener('input', (e) => {
-        if (!state.notes) state.notes = {};
-        state.notes[day.dateKey] = e.target.value;
-        saveState();
-      });
-    }
+    bindAltNoteInput(card, day);
 
   } else if (day.isWorkoutDay) {
     const dayExs = (state.completedExercises && state.completedExercises[day.dateKey]) || {};
-    const note = (state.notes && state.notes[day.dateKey]) || '';
 
     let rowsHtml = '';
     day.exercises.forEach((ex, idx) => {
@@ -601,16 +594,7 @@ function renderSelectedDayView() {
         ${rowsHtml}
       </div>
 
-      <div class="compact-note-line">
-        <input 
-          type="text" 
-          id="compactDayNote" 
-          class="compact-note-input" 
-          data-date-key="${day.dateKey}" 
-          placeholder="Notat for økten (f.eks. +5 kg i sekk, smerte 2/10)..." 
-          value="${escapeHtml(note)}" 
-        />
-      </div>
+      ${buildAltNoteHtml(day, 'F.eks. +5 kg i sekk, smerte 2/10, eller ekstra sykkeltur...')}
     `;
 
     // Sjekkboks event handlers
@@ -679,15 +663,7 @@ function renderSelectedDayView() {
       });
     }
 
-    // Notat-input
-    const noteInput = card.querySelector('#compactDayNote');
-    if (noteInput) {
-      noteInput.addEventListener('input', (e) => {
-        if (!state.notes) state.notes = {};
-        state.notes[day.dateKey] = e.target.value;
-        saveState();
-      });
-    }
+    bindAltNoteInput(card, day);
 
   } else {
     // Hviledagskort
@@ -702,8 +678,60 @@ function renderSelectedDayView() {
           </div>
         </div>
       </div>
+      ${buildAltNoteHtml(day, 'F.eks. syklet 30 min i stedet, lett gåtur...')}
     `;
+    bindAltNoteInput(card, day);
   }
+}
+
+/**
+ * HTML for «Alternativ trening / notat»-feltet
+ */
+function buildAltNoteHtml(day, placeholder) {
+  const note = (state.notes && state.notes[day.dateKey]) || '';
+  return `
+    <div class="compact-note-line">
+      <label class="compact-note-label" for="compactDayNote">★ Alternativ trening / notat</label>
+      <input 
+        type="text" 
+        id="compactDayNote" 
+        class="compact-note-input" 
+        data-date-key="${day.dateKey}" 
+        placeholder="${escapeHtml(placeholder)}" 
+        value="${escapeHtml(note)}" 
+      />
+    </div>
+  `;
+}
+
+/**
+ * Lagrer notat og oppdaterer stjerne i heatmap uten å ødelegge fokus i input
+ */
+function bindAltNoteInput(card, day) {
+  const noteInput = card.querySelector('#compactDayNote');
+  if (!noteInput) return;
+
+  noteInput.addEventListener('input', (e) => {
+    if (!state.notes) state.notes = {};
+    const value = e.target.value;
+    if (value.trim()) {
+      state.notes[day.dateKey] = value;
+    } else {
+      delete state.notes[day.dateKey];
+    }
+    saveState();
+    renderHeatmap();
+    // Oppdater kun undertittel-tag uten å re-rendre input (bevarer fokus/markør)
+    const subEl = document.getElementById('selectedDaySub');
+    if (subEl) {
+      const existing = subEl.innerHTML.replace(/\s*·\s*<span class="tag-alt-note">★ Alternativ<\/span>/g, '');
+      if (hasDayNote(day.dateKey, state)) {
+        subEl.innerHTML = `${existing} · <span class="tag-alt-note">★ Alternativ</span>`;
+      } else {
+        subEl.innerHTML = existing;
+      }
+    }
+  });
 }
 
 /**

@@ -9,6 +9,7 @@ import {
   generatePlan,
   calculateStats,
   isDayFullyCompleted,
+  hasDayNote,
   formatNorwegianDate,
   formatDateKey,
   getMotivationalMessage,
@@ -278,4 +279,13 @@ test('calculateStats håndterer skippede dager korrekt', () => {
   const stats = calculateStats(plan, state);
   assert.equal(stats.completedWorkouts, 1);
   assert.equal(isDayFullyCompleted(plan.days[2], state), false);
+});
+
+test('hasDayNote gjenkjenner ikke-tomme notater for alternativ trening', () => {
+  assert.equal(hasDayNote('2026-09-16', {}), false);
+  assert.equal(hasDayNote('2026-09-16', { notes: {} }), false);
+  assert.equal(hasDayNote('2026-09-16', { notes: { '2026-09-16': '' } }), false);
+  assert.equal(hasDayNote('2026-09-16', { notes: { '2026-09-16': '   ' } }), false);
+  assert.equal(hasDayNote('2026-09-16', { notes: { '2026-09-16': 'Syklet 30 min' } }), true);
+  assert.equal(hasDayNote('2026-09-15', { notes: { '2026-09-16': 'Syklet 30 min' } }), false);
 });
