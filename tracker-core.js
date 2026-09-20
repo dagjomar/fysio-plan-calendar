@@ -147,7 +147,8 @@ export function generatePlan(
   startDateStr = '2026-09-15',
   endDateStr = '2026-10-15',
   startRehabWeek = 24,
-  customWeeklyExercises = {}
+  customWeeklyExercises = {},
+  skippedDays = {}
 ) {
   const start = new Date(startDateStr + 'T00:00:00');
   const end = new Date(endDateStr + 'T00:00:00');
@@ -156,11 +157,28 @@ export function generatePlan(
   const curr = new Date(start);
   let dayIndex = 0;
   let workoutNumber = 1;
+  let scheduleOffset = 0;
 
   while (curr <= end) {
     const dateKey = formatDateKey(curr);
     const dateObj = new Date(curr);
-    const isWorkoutDay = dayIndex % 2 === 0; // Annenhver dag starter med treningsdag
+    const skipOption = skippedDays[dateKey];
+    const isSkipped = !!skipOption;
+
+    // Standard annenhver dag mønster justert for akkumulerte forskyvninger
+    const rawPatternWorkout = (dayIndex + scheduleOffset) % 2 === 0;
+
+    let isWorkoutDay = false;
+    if (isSkipped) {
+      isWorkoutDay = false;
+      // Hvis dagen oprinnelig ville vært en treningsdag og man valgte 'shift',
+      // forskyves resten av planen slik at neste dag (hvis hviledag) blir treningsdag.
+      if (skipOption === 'shift' && rawPatternWorkout) {
+        scheduleOffset = (scheduleOffset + 1) % 2;
+      }
+    } else {
+      isWorkoutDay = rawPatternWorkout;
+    }
     
     // Beregn uke-indeks i perioden (0, 1, 2, 3...)
     const weekIndex = Math.floor(dayIndex / 7);
@@ -180,6 +198,8 @@ export function generatePlan(
       formattedDate: formatNorwegianDate(dateObj),
       formattedDateShort: formatNorwegianDate(dateObj, true),
       isWorkoutDay,
+      isSkipped,
+      skipOption: skipOption || null,
       workoutNumber: isWorkoutDay ? workoutNumber++ : null,
       weekIndex,
       rehabWeek,
@@ -212,7 +232,8 @@ export function generatePlan(
     weeks,
     totalDays: days.length,
     totalWorkoutDays: days.filter(d => d.isWorkoutDay).length,
-    totalRestDays: days.filter(d => !d.isWorkoutDay).length
+    totalRestDays: days.filter(d => !d.isWorkoutDay && !d.isSkipped).length,
+    totalSkippedDays: days.filter(d => d.isSkipped).length
   };
 }
 
@@ -301,7 +322,7 @@ export function calculateStats(plan, state = {}) {
  * Sjekker om en konkret treningsdag er fullført
  */
 export function isDayFullyCompleted(day, state = {}) {
-  if (!day.isWorkoutDay) return false;
+  if (!day.isWorkoutDay || day.isSkipped) return false;
   const completedDays = state.completedDays || {};
   if (completedDays[day.dateKey]) return true;
 

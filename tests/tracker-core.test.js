@@ -99,6 +99,32 @@ test('calculateStats beregner fullførte økter og prosentandel korrekt', () => 
   assert.equal(stats3.completedWorkouts, 0);
 });
 
+test('Flere skift og tilbakestilling av skipped dager', () => {
+  // To skift:
+  // Dag 0 (15. sep): Trening #1
+  // Dag 1 (16. sep): Hvile
+  // Dag 2 (17. sep): Skift 1 -> blir skip. Dag 3 (18. sep) blir Trening #2. Dag 4 (19. sep) blir Hvile.
+  // Dag 5 (20. sep): Trening #3.
+  // Hvis Dag 3 (18. sep) også skiftes:
+  // Dag 3 blir skip. Dag 4 (19. sep) blir Trening #2. Dag 5 (20. sep) blir Hvile. Dag 6 (21. sep) blir Trening #3.
+  const skippedDays = {
+    '2026-09-17': 'shift',
+    '2026-09-18': 'shift'
+  };
+
+  const plan = generatePlan('2026-09-15', '2026-10-15', 24, {}, skippedDays);
+
+  assert.equal(plan.days[0].isWorkoutDay, true); // 15. sep
+  assert.equal(plan.days[1].isWorkoutDay, false); // 16. sep
+  assert.equal(plan.days[2].isSkipped, true); // 17. sep skipped
+  assert.equal(plan.days[3].isSkipped, true); // 18. sep skipped
+  assert.equal(plan.days[4].isWorkoutDay, true); // 19. sep Trening #2
+  assert.equal(plan.days[4].workoutNumber, 2);
+  assert.equal(plan.days[5].isWorkoutDay, false); // 20. sep Hvile
+  assert.equal(plan.days[6].isWorkoutDay, true); // 21. sep Trening #3
+  assert.equal(plan.days[6].workoutNumber, 3);
+});
+
 test('isDayFullyCompleted fungerer for både hele dager og individuelle øvelser', () => {
   const plan = generatePlan('2026-09-15', '2026-10-15', 24);
   const day0 = plan.days[0]; // 15. sep
@@ -145,4 +171,111 @@ test('getMotivationalMessage gir oppmuntrende meldinger', () => {
   assert.ok(getMotivationalMessage(0).length > 10);
   assert.ok(getMotivationalMessage(50).includes('halvveis') || getMotivationalMessage(50).length > 10);
   assert.ok(getMotivationalMessage(100).includes('100%'));
+});
+
+test('generatePlan med hoppet over dag (skip and don\'t move)', () => {
+  // Standard plan:
+  // 15. sep (dag 0): treningsdag #1
+  // 16. sep (dag 1): hviledag
+  // 17. sep (dag 2): treningsdag #2
+  // 18. sep (dag 3): hviledag
+  // 19. sep (dag 4): treningsdag #3
+  const skippedDays = {
+    '2026-09-17': 'no-shift' // Hopp over 17. sep uten å flytte resten
+  };
+
+  const plan = generatePlan('2026-09-15', '2026-10-15', 24, {}, skippedDays);
+  
+  // Dag 0 (15. sep): treningsdag #1
+  assert.equal(plan.days[0].dateKey, '2026-09-15');
+  assert.equal(plan.days[0].isWorkoutDay, true);
+  assert.equal(plan.days[0].workoutNumber, 1);
+
+  // Dag 1 (16. sep): hviledag
+  assert.equal(plan.days[1].dateKey, '2026-09-16');
+  assert.equal(plan.days[1].isWorkoutDay, false);
+  assert.equal(plan.days[1].isSkipped, false);
+
+  // Dag 2 (17. sep): hoppet over (ikke treningsdag)
+  assert.equal(plan.days[2].dateKey, '2026-09-17');
+  assert.equal(plan.days[2].isWorkoutDay, false);
+  assert.equal(plan.days[2].isSkipped, true);
+  assert.equal(plan.days[2].skipOption, 'no-shift');
+  assert.equal(plan.days[2].workoutNumber, null);
+
+  // Dag 3 (18. sep): forblir hviledag fordi vi valgte no-shift
+  assert.equal(plan.days[3].dateKey, '2026-09-18');
+  assert.equal(plan.days[3].isWorkoutDay, false);
+  assert.equal(plan.days[3].isSkipped, false);
+
+  // Dag 4 (19. sep): forblir treningsdag, men nå treningsdag #2
+  assert.equal(plan.days[4].dateKey, '2026-09-19');
+  assert.equal(plan.days[4].isWorkoutDay, true);
+  assert.equal(plan.days[4].workoutNumber, 2);
+
+  assert.equal(plan.totalSkippedDays, 1);
+  assert.equal(plan.totalWorkoutDays, 15);
+});
+
+test('generatePlan med hoppet over dag og forskyvning (skip and move all from here)', () => {
+  // Standard plan:
+  // 15. sep (dag 0): treningsdag #1
+  // 16. sep (dag 1): hviledag
+  // 17. sep (dag 2): treningsdag
+  // 18. sep (dag 3): hviledag -> skal nå bli treningsdag #2!
+  // 19. sep (dag 4): treningsdag -> skal nå bli hviledag!
+  // 20. sep (dag 5): hviledag -> skal nå bli treningsdag #3!
+  const skippedDays = {
+    '2026-09-17': 'shift' // Hopp over og forskyv alt fra her
+  };
+
+  const plan = generatePlan('2026-09-15', '2026-10-15', 24, {}, skippedDays);
+
+  // Dag 0 (15. sep): treningsdag #1
+  assert.equal(plan.days[0].isWorkoutDay, true);
+  assert.equal(plan.days[0].workoutNumber, 1);
+
+  // Dag 1 (16. sep): hviledag
+  assert.equal(plan.days[1].isWorkoutDay, false);
+
+  // Dag 2 (17. sep): hoppet over dag
+  assert.equal(plan.days[2].dateKey, '2026-09-17');
+  assert.equal(plan.days[2].isWorkoutDay, false);
+  assert.equal(plan.days[2].isSkipped, true);
+  assert.equal(plan.days[2].skipOption, 'shift');
+  assert.equal(plan.days[2].workoutNumber, null);
+
+  // Dag 3 (18. sep): neste hviledag ble nå treningsdag #2!
+  assert.equal(plan.days[3].dateKey, '2026-09-18');
+  assert.equal(plan.days[3].isWorkoutDay, true);
+  assert.equal(plan.days[3].workoutNumber, 2);
+
+  // Dag 4 (19. sep): tidligere treningsdag ble nå hviledag!
+  assert.equal(plan.days[4].dateKey, '2026-09-19');
+  assert.equal(plan.days[4].isWorkoutDay, false);
+  assert.equal(plan.days[4].workoutNumber, null);
+
+  // Dag 5 (20. sep): tidligere hviledag ble nå treningsdag #3!
+  assert.equal(plan.days[5].dateKey, '2026-09-20');
+  assert.equal(plan.days[5].isWorkoutDay, true);
+  assert.equal(plan.days[5].workoutNumber, 3);
+});
+
+test('calculateStats håndterer skippede dager korrekt', () => {
+  const skippedDays = {
+    '2026-09-17': 'shift'
+  };
+  const plan = generatePlan('2026-09-15', '2026-10-15', 24, {}, skippedDays);
+
+  const state = {
+    skippedDays,
+    completedDays: {
+      '2026-09-15': true,
+      '2026-09-17': true // Skal ignoreres for skipped dag
+    }
+  };
+
+  const stats = calculateStats(plan, state);
+  assert.equal(stats.completedWorkouts, 1);
+  assert.equal(isDayFullyCompleted(plan.days[2], state), false);
 });
