@@ -8,9 +8,12 @@ import {
   calculateStats,
   isDayFullyCompleted,
   hasDayNote,
+  getDayExercises,
+  extendDateByWeeks,
   formatDateKey,
   formatNorwegianDate,
-  DEFAULT_EXERCISES
+  DEFAULT_EXERCISES,
+  STANDARD_EXERCISES
 } from './tracker-core.js';
 
 // Nøkkel for localStorage
@@ -23,13 +26,15 @@ let state = {
   skippedDays: {},
   notes: {},
   customWeeklyExercises: {},
+  dayExercises: {},
   theme: 'light',
-  selectedDateKey: null
+  selectedDateKey: null,
+  endDate: '2026-11-15'
 };
 
-// Start- og sluttdatoer for perioden (Starter tirsdag 15. september)
+// Start- og sluttdatoer for perioden (Starter tirsdag 15. september, standard til 15. november)
 const START_DATE = '2026-09-15';
-const END_DATE = '2026-10-15';
+const DEFAULT_END_DATE = '2026-11-15';
 const START_REHAB_WEEK = 24;
 
 let currentPlan = null;
@@ -43,6 +48,13 @@ function loadState() {
     if (raw) {
       const parsed = JSON.parse(raw);
       state = { ...state, ...parsed };
+    }
+    // Sørg for at kalenderen utvides til minst 15. november for eksisterende lagret tilstand
+    if (!state.endDate || state.endDate < DEFAULT_END_DATE) {
+      state.endDate = DEFAULT_END_DATE;
+    }
+    if (!state.dayExercises) {
+      state.dayExercises = {};
     }
   } catch (err) {
     console.warn('Kunne ikke laste tilstand fra localStorage:', err);
@@ -91,7 +103,8 @@ function init() {
 }
 
 function rebuildPlan() {
-  currentPlan = generatePlan(START_DATE, END_DATE, START_REHAB_WEEK, state.customWeeklyExercises, state.skippedDays || {});
+  const endDate = state.endDate || DEFAULT_END_DATE;
+  currentPlan = generatePlan(START_DATE, endDate, START_REHAB_WEEK, state.customWeeklyExercises, state.skippedDays || {});
 }
 
 /**
@@ -132,15 +145,29 @@ function setupEventListeners() {
   const resetBtn = document.getElementById('resetCheckboxesBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      if (confirm('Vil du nullstille alle avkrysninger og overhoppede dager i treningsplanen?')) {
+      if (confirm('Vil du nullstille alle avkrysninger, egne linjer og overhoppede dager i treningsplanen?')) {
         state.completedDays = {};
         state.completedExercises = {};
         state.skippedDays = {};
         state.notes = {};
+        state.dayExercises = {};
         rebuildPlan();
         saveState();
         renderAll();
       }
+    });
+  }
+
+  // Utvid treningskalenderen (+4 uker)
+  const extendBtn = document.getElementById('extendCalendarBtn');
+  if (extendBtn) {
+    extendBtn.addEventListener('click', () => {
+      const currentEnd = state.endDate || DEFAULT_END_DATE;
+      const newEnd = extendDateByWeeks(currentEnd, 4);
+      state.endDate = newEnd;
+      rebuildPlan();
+      saveState();
+      renderAll();
     });
   }
 
@@ -205,7 +232,8 @@ function setupModalListeners() {
 
   if (editExercisesBtn && exerciseModal) {
     editExercisesBtn.addEventListener('click', () => {
-      populateModalExercises(modalWeekSelect.value);
+      populateWeekSelectOptions();
+      populateModalExercises(modalWeekSelect.value || '0');
       exerciseModal.classList.remove('hidden');
     });
 
@@ -237,6 +265,24 @@ function setupModalListeners() {
         renderAll();
       }
     });
+  }
+}
+
+function populateWeekSelectOptions() {
+  const select = document.getElementById('modalWeekSelect');
+  if (!select || !currentPlan || !currentPlan.weeks) return;
+  const currentVal = select.value;
+  select.innerHTML = '';
+  currentPlan.weeks.forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = String(w.weekIndex);
+    const firstDay = w.days[0];
+    const lastDay = w.days[w.days.length - 1];
+    opt.textContent = `Uke ${w.rehabWeek} (${firstDay.dayNumber}. ${firstDay.monthName.slice(0, 3)} – ${lastDay.dayNumber}. ${lastDay.monthName.slice(0, 3)})`;
+    select.appendChild(opt);
+  });
+  if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
+    select.value = currentVal;
   }
 }
 
@@ -312,7 +358,7 @@ function populateModalExercises(weekIndexStr) {
   const container = document.getElementById('modalExercisesForm');
   if (!container) return;
 
-  const currentExs = (state.customWeeklyExercises && state.customWeeklyExercises[weekIdx]) || DEFAULT_EXERCISES[Math.min(weekIdx, 3)];
+  const currentExs = (state.customWeeklyExercises && state.customWeeklyExercises[weekIdx]) || DEFAULT_EXERCISES[weekIdx] || DEFAULT_EXERCISES.default || STANDARD_EXERCISES;
 
   container.innerHTML = '';
   currentExs.forEach((ex, idx) => {
@@ -376,6 +422,18 @@ function renderHeaderStats() {
   const label = document.getElementById('compactProgressLabel');
   if (label) {
     label.textContent = `${stats.completedWorkouts} av ${stats.totalWorkouts} fullført (${stats.percentage}%)`;
+  }
+  const badge = document.querySelector('.brand-badge');
+  if (badge && currentPlan.days.length > 0) {
+    const firstWeek = currentPlan.days[0].rehabWeek;
+    const lastWeek = currentPlan.days[currentPlan.days.length - 1].rehabWeek;
+    badge.textContent = `Uke ${firstWeek}–${lastWeek}`;
+  }
+  const heatmapTitle = document.getElementById('heatmapTitle');
+  if (heatmapTitle && currentPlan.days.length > 0) {
+    const firstDay = currentPlan.days[0];
+    const lastDay = currentPlan.days[currentPlan.days.length - 1];
+    heatmapTitle.textContent = `📅 Fremdrift & dager (${firstDay.dayNumber}. ${firstDay.monthName.slice(0, 3)} – ${lastDay.dayNumber}. ${lastDay.monthName.slice(0, 3)})`;
   }
 }
 
@@ -547,28 +605,72 @@ function renderSelectedDayView() {
     bindAltNoteInput(card, day);
 
   } else if (day.isWorkoutDay) {
+    const exercises = getDayExercises(day, state);
     const dayExs = (state.completedExercises && state.completedExercises[day.dateKey]) || {};
+    const hasCustomDayLines = !!(state.dayExercises && state.dayExercises[day.dateKey]);
 
     let rowsHtml = '';
-    day.exercises.forEach((ex, idx) => {
-      const isChecked = !!dayExs[ex.id];
-      rowsHtml += `
-        <label class="compact-ex-row ${isChecked ? 'row-checked' : ''}" data-ex-id="${ex.id}">
-          <input 
-            type="checkbox" 
-            class="compact-ex-check" 
-            data-date-key="${day.dateKey}" 
-            data-ex-id="${ex.id}" 
-            ${isChecked ? 'checked' : ''}
-          />
-          <span class="ex-idx">${idx + 1}</span>
-          <span class="ex-main-text" title="${escapeHtml(ex.description)}">
-            <strong class="ex-name">${escapeHtml(ex.name)}</strong>
-            <span class="ex-target">${escapeHtml(ex.target)}</span>
-          </span>
-        </label>
-      `;
-    });
+    if (exercises.length === 0) {
+      rowsHtml = '<div class="no-exercises-msg">Ingen øvelser på denne treningsdagen. Legg til en linje nedenfor!</div>';
+    } else {
+      exercises.forEach((ex, idx) => {
+        const isChecked = !!dayExs[ex.id];
+        rowsHtml += `
+          <div class="compact-ex-row ${isChecked ? 'row-checked' : ''}" data-ex-id="${escapeHtml(ex.id)}">
+            <label class="compact-ex-check-label">
+              <input 
+                type="checkbox" 
+                class="compact-ex-check" 
+                data-date-key="${day.dateKey}" 
+                data-ex-id="${escapeHtml(ex.id)}" 
+                ${isChecked ? 'checked' : ''}
+              />
+              <span class="ex-idx">${idx + 1}</span>
+              <span class="ex-main-text" title="${escapeHtml(ex.description || '')}">
+                <strong class="ex-name">${escapeHtml(ex.name)}</strong>
+                <span class="ex-target">${escapeHtml(ex.target || '')}</span>
+              </span>
+            </label>
+            <button 
+              type="button" 
+              class="btn-remove-line" 
+              data-date-key="${day.dateKey}" 
+              data-ex-id="${escapeHtml(ex.id)}" 
+              title="Fjern linje"
+              aria-label="Fjern ${escapeHtml(ex.name)}"
+            >✕</button>
+          </div>
+        `;
+      });
+    }
+
+    const dayLinesControlsHtml = `
+      <form class="add-line-form" id="addDayLineForm" data-date-key="${day.dateKey}">
+        <input 
+          type="text" 
+          class="input-add-name" 
+          id="newExerciseName" 
+          placeholder="Legg til egen linje / øvelse..." 
+          required 
+          autocomplete="off"
+        />
+        <input 
+          type="text" 
+          class="input-add-target" 
+          id="newExerciseTarget" 
+          placeholder="Mål / reps" 
+          autocomplete="off"
+        />
+        <button type="submit" class="btn-add-line">➕ Legg til</button>
+      </form>
+      ${hasCustomDayLines ? `
+        <div class="day-lines-actions">
+          <button type="button" class="btn-reset-day-lines" id="resetDayLinesBtn" data-date-key="${day.dateKey}">
+            ↩️ Tilbakestill til standardøvelser
+          </button>
+        </div>
+      ` : ''}
+    `;
 
     card.className = `day-action-card workout ${isCompleted ? 'is-completed' : ''}`;
     card.innerHTML = `
@@ -594,6 +696,8 @@ function renderSelectedDayView() {
         ${rowsHtml}
       </div>
 
+      ${dayLinesControlsHtml}
+
       ${buildAltNoteHtml(day, 'F.eks. +5 kg i sekk, smerte 2/10, eller ekstra sykkeltur...')}
     `;
 
@@ -610,14 +714,62 @@ function renderSelectedDayView() {
         }
         state.completedExercises[dateKey][exId] = checked;
 
-        // Hvis alle øvelsene er krysset av, sett dagen som fullført
-        const allDone = day.exercises.every(ex => !!state.completedExercises[dateKey][ex.id]);
+        // Hvis alle øvelsene er krysset av, marker som fullført
+        const currentExs = getDayExercises(day, state);
+        const allDone = currentExs.length > 0 && currentExs.every(ex => !!state.completedExercises[dateKey][ex.id]);
         if (allDone) {
           state.completedDays[dateKey] = true;
           triggerConfetti();
           triggerVibration();
+        }
+        // Merk: Vi sletter ikke state.completedDays her hvis noen er ukrysset,
+        // slik at fullført kan stå uavhengig av sjekkliste.
+
+        saveState();
+        renderHeaderStats();
+        renderHeatmap();
+        renderSelectedDayView();
+      });
+    });
+
+    // Marker hele treningen som fullført knapp (uavhengig av sjekkliste)
+    const masterBtn = card.querySelector('#toggleWorkoutDoneBtn');
+    if (masterBtn) {
+      masterBtn.addEventListener('click', () => {
+        const currentlyDone = isDayFullyCompleted(day, state);
+        if (currentlyDone) {
+          delete state.completedDays[day.dateKey];
+          if (state.completedExercises[day.dateKey]) {
+            state.completedExercises[day.dateKey] = {};
+          }
         } else {
-          delete state.completedDays[dateKey];
+          state.completedDays[day.dateKey] = true;
+          triggerConfetti();
+          triggerVibration();
+        }
+
+        saveState();
+        renderHeaderStats();
+        renderHeatmap();
+        renderSelectedDayView();
+      });
+    }
+
+    // Fjern linje-knapper (✕)
+    const removeBtns = card.querySelectorAll('.btn-remove-line');
+    removeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const exId = btn.dataset.exId;
+        const dateKey = btn.dataset.dateKey;
+
+        if (!state.dayExercises[dateKey]) {
+          state.dayExercises[dateKey] = getDayExercises(day, state).map(x => ({ ...x }));
+        }
+        state.dayExercises[dateKey] = state.dayExercises[dateKey].filter(x => x.id !== exId);
+
+        if (state.completedExercises && state.completedExercises[dateKey]) {
+          delete state.completedExercises[dateKey][exId];
         }
 
         saveState();
@@ -627,31 +779,49 @@ function renderSelectedDayView() {
       });
     });
 
-    // Marker hele treningen som fullført knapp
-    const masterBtn = card.querySelector('#toggleWorkoutDoneBtn');
-    if (masterBtn) {
-      masterBtn.addEventListener('click', () => {
-        const currentlyDone = isDayFullyCompleted(day, state);
-        const nextDone = !currentlyDone;
+    // Skjema for å legge til egen linje på treningsdagen
+    const addForm = card.querySelector('#addDayLineForm');
+    if (addForm) {
+      addForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nameInput = card.querySelector('#newExerciseName');
+        const targetInput = card.querySelector('#newExerciseTarget');
+        const name = nameInput ? nameInput.value.trim() : '';
+        const target = targetInput ? targetInput.value.trim() : '';
 
-        state.completedDays[day.dateKey] = nextDone;
-        if (!state.completedExercises[day.dateKey]) {
-          state.completedExercises[day.dateKey] = {};
+        if (!name) return;
+
+        if (!state.dayExercises[day.dateKey]) {
+          state.dayExercises[day.dateKey] = getDayExercises(day, state).map(x => ({ ...x }));
         }
-
-        day.exercises.forEach(ex => {
-          state.completedExercises[day.dateKey][ex.id] = nextDone;
+        const newId = `custom-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        state.dayExercises[day.dateKey].push({
+          id: newId,
+          name,
+          target: target || '3 sett',
+          description: 'Egendefinert linje'
         });
-
-        if (nextDone) {
-          triggerConfetti();
-          triggerVibration();
-        }
 
         saveState();
         renderHeaderStats();
         renderHeatmap();
         renderSelectedDayView();
+      });
+    }
+
+    // Tilbakestill til standardøvelser for dagen
+    const resetLinesBtn = card.querySelector('#resetDayLinesBtn');
+    if (resetLinesBtn) {
+      resetLinesBtn.addEventListener('click', () => {
+        if (confirm('Vil du tilbakestille denne treningsdagen til standardøvelsene?')) {
+          if (state.dayExercises) {
+            delete state.dayExercises[day.dateKey];
+          }
+          saveState();
+          renderHeaderStats();
+          renderHeatmap();
+          renderSelectedDayView();
+        }
       });
     }
 

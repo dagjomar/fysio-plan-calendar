@@ -182,6 +182,31 @@ body {
   gap: 0.4rem;
 }
 
+.heatmap-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-extend-calendar {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.btn-extend-calendar:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
 .heatmap-title {
   font-size: 0.8rem;
   font-weight: 700;
@@ -504,18 +529,133 @@ body {
 .compact-ex-row {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 0.6rem;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
   background: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  cursor: pointer;
   transition: all 0.12s ease;
   user-select: none;
 }
 
 .compact-ex-row:hover {
   border-color: var(--primary);
+}
+
+.compact-ex-check-label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.btn-remove-line {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.btn-remove-line:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.add-line-form {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  align-items: center;
+}
+
+.input-add-name {
+  flex: 2;
+  padding: 0.35rem 0.5rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.input-add-name:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.input-add-target {
+  flex: 1;
+  max-width: 95px;
+  padding: 0.35rem 0.5rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.input-add-target:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.btn-add-line {
+  padding: 0.35rem 0.65rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.78rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.btn-add-line:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.day-lines-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.15rem;
+}
+
+.btn-reset-day-lines {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.15rem 0;
+}
+
+.btn-reset-day-lines:hover {
+  color: var(--primary);
+}
+
+.no-exercises-msg {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 0.5rem;
+  text-align: center;
+  font-style: italic;
 }
 
 .compact-ex-row.row-checked {

@@ -21,9 +21,9 @@
     <!-- Topplinje -->
     <header class="compact-header">
       <div class="brand-line">
-        <span class="brand-badge">Uke 24–28</span>
+        <span class="brand-badge">Uke 24–32</span>
         <h1 class="brand-title">Akilles Trening</h1>
-        <span class="brand-progress" id="compactProgressLabel">0 / 16 fullført (0%)</span>
+        <span class="brand-progress" id="compactProgressLabel">0 fullført</span>
       </div>
       <div class="header-tools no-print">
         <button id="themeToggleBtn" class="icon-btn" title="Bytt lyst/mørkt tema" aria-label="Tema">
@@ -44,7 +44,12 @@
     <!-- Git Commit Stats Heatmap / Rutenettoversikt -->
     <section class="heatmap-section" aria-label="Treningskalender oversikt">
       <div class="heatmap-header">
-        <span class="heatmap-title">📅 Fremdrift & dager (15. sep – 15. okt)</span>
+        <div class="heatmap-title-wrap">
+          <span class="heatmap-title" id="heatmapTitle">📅 Fremdrift & dager</span>
+          <button id="extendCalendarBtn" class="btn-extend-calendar no-print" title="Utvid treningskalenderen med 4 uker">
+            ➕ Utvid (+4 uker)
+          </button>
+        </div>
         <div class="heatmap-legend">
           <span class="legend-item"><span class="legend-swatch done"></span> Fullført</span>
           <span class="legend-item"><span class="legend-swatch workout"></span> Trening</span>
@@ -70,7 +75,7 @@
         <div class="selected-day-meta">
           <button id="todayJumpBtn" class="today-chip" title="Gå til i dag">I dag</button>
           <div class="selected-day-title" id="selectedDayTitle">Tirsdag 15. september</div>
-          <div class="selected-day-sub" id="selectedDaySub">Uke 24 · Økt 1 av 16</div>
+          <div class="selected-day-sub" id="selectedDaySub">Uke 24 · Økt 1</div>
         </div>
         <button id="nextDayBtn" class="nav-step-btn" title="Neste dag" aria-label="Neste dag">
           Neste ›
@@ -86,9 +91,12 @@
     <!-- Valgfri sammenleggbar info / fysiologiske prinsipper -->
     <details class="principles-accordion no-print" id="principlesAccordion">
       <summary class="principles-summary">
-        <span>💡 Viktige prinsipper for akillesopptrening (24-timers-regel & hvile)</span>
+        <span>💡 Viktige prinsipper for akillesopptrening (fysio 12. okt & 24-timers-regel)</span>
       </summary>
       <div class="principles-content">
+        <div class="principle-box">
+          <strong>🔥 Drop-sett til failure (12. okt fysio):</strong> 1 cm muskelforskjell i leggen. Umiddelbart etter siste sett med ett-beins tåhev, begynn på tobeins opp og ett bein ned til failure for å øke belastningen og dra ut det siste av muskelen.
+        </div>
         <div class="principle-box">
           <strong>⏱️ Annenhver dag:</strong> Kollagensyntesen i akillessenen trenger 36–48 timer hvile for superkompensasjon og forsterkning.
         </div>
@@ -96,7 +104,7 @@
           <strong>🚦 24-timers-regelen:</strong> Smerte under trening opptil 3–4/10 er tillatt, men eventuell morgenstivhet neste dag skal være tilbake til baseline før neste økt.
         </div>
         <div class="principle-box">
-          <strong>🐢 Rolig tempo (HSR):</strong> 3 sek opp, 2 sek toppstopp, 3 sek kontrollert ned.
+          <strong>🤸 Fri form på øktene:</strong> Marker dagen som fullført uavhengig av sjekkliste, og legg til eller slett øvelseslinjer etter behov.
         </div>
       </div>
     </details>
