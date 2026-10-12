@@ -33,88 +33,52 @@ export const NORWEGIAN_MONTHS_SHORT = [
   'jul', 'aug', 'sep', 'okt', 'nov', 'des'
 ];
 
+/**
+ * Standard øvelser avtalt med fysioterapeut 12. oktober:
+ * - Ett-beins tåhev med drop-sett (tobeins opp, ett bein ned til failure etter siste sett for å ta igjen 1 cm muskelforskjell)
+ * - Bulgarsk utfall for styrke i sete, lår og leddstabilitet
+ */
+export const STANDARD_EXERCISES = [
+  {
+    id: 'ex-1',
+    name: 'Ett-beins tåhev (m/ drop-sett)',
+    description: 'Umiddelbart etter siste sett: begynn på tobeins opp og ett bein ned til failure for å øke belastningen og hente inn 1 cm muskelforskjell.',
+    target: '3-4 sett x 8-12 reps (+ drop-sett)'
+  },
+  {
+    id: 'ex-2',
+    name: 'Bulgarsk utfall',
+    description: 'Kontrollert tempo og god dybde. Styrker lår, sete og stabilitet rundt ankel og kne.',
+    target: '3 sett x 8-10 reps'
+  }
+];
+
 export const DEFAULT_EXERCISES = {
-  0: [ // Uke 24 (12. sep - 18. sep)
-    {
-      id: 'ex-1',
-      name: 'Stående tåhev på ett ben',
-      description: 'Styrker m. gastrocnemius og akillessenens tåleevne. 3 sek opp, 2 sek hold på toppen, 3 sek kontrollert ned.',
-      target: '3-4 sett x 10-12 reps'
-    },
-    {
-      id: 'ex-2',
-      name: 'Sittende tåhev med vekt på knærne',
-      description: 'Isolerer m. soleus (den dype leggmuskelen som tar størst kraft under løp og gange).',
-      target: '3 sett x 12-15 reps'
-    },
-    {
-      id: 'ex-3',
-      name: 'Eksentrisk hælsenkning over trappetrinn',
-      description: 'Opp med begge ben, rolig og kontrollert senkning på det skadede benet under trinnivå.',
-      target: '3 sett x 10 reps'
-    }
-  ],
-  1: [ // Uke 25 (19. sep - 25. sep)
-    {
-      id: 'ex-1',
-      name: 'Stående tåhev på ett ben med ekstra vekt',
-      description: 'Bruk en ryggsekk med bøker eller manual for progressiv overbelastning.',
-      target: '3-4 sett x 8-10 reps (+2-5 kg)'
-    },
-    {
-      id: 'ex-2',
-      name: 'Sittende tåhev med økt belastning',
-      description: 'Fokus på fullt bevegelsesutslag og 2 sekunders stopp på toppen for optimal seneadapsjon.',
-      target: '3 sett x 12 reps'
-    },
-    {
-      id: 'ex-3',
-      name: 'Eksentrisk hælsenkning på ett ben over kant',
-      description: 'Rolig senkning forbi horisontalt nivå. Stopp ved smerte > 3/10.',
-      target: '3 sett x 10-12 reps'
-    }
-  ],
-  2: [ // Uke 26 (26. sep - 2. okt)
-    {
-      id: 'ex-1',
-      name: 'Tung stående tåhev på ett ben (HSR)',
-      description: 'Heavy Slow Resistance: Høyere vekt, langsomt tempo (3 sek opp, 3 sek ned).',
-      target: '4 sett x 8 reps (tyngre belastning)'
-    },
-    {
-      id: 'ex-2',
-      name: 'Sittende tåhev med progressiv motstand',
-      description: 'Hold spenningen i bunnposisjon i 1 sekund før kraftfullt løft.',
-      target: '3-4 sett x 10-12 reps'
-    },
-    {
-      id: 'ex-3',
-      name: 'Eksentrisk senkning + Balanse på balansepute / ettbens balanse',
-      description: 'Eksentrisk senkning kombinert med leddsans og stabilitet på ustabilt underlag.',
-      target: '3 sett x 10 reps + 3 x 45 sek balanse'
-    }
-  ],
-  3: [ // Uke 27/28 (3. okt - 12. okt)
-    {
-      id: 'ex-1',
-      name: 'Stående tåhev på ett ben (Styrketest & kvalitet)',
-      description: 'Fokus på lik høyde og utholdenhet sammenlignet med frisk side før neste fysioterapikontroll.',
-      target: '4 sett x 8-10 reps'
-    },
-    {
-      id: 'ex-2',
-      name: 'Sittende tåhev med toppbelastning',
-      description: 'Bygg maksimal utholdende styrke i soleus.',
-      target: '4 sett x 10 reps'
-    },
-    {
-      id: 'ex-3',
-      name: 'Eksentrisk senkning / Forberedende vristhopp (sprett)',
-      description: 'Lette vristhopp eller hurtig eksentrisk oppbremsing, kun dersom godkjent av fysioterapeut.',
-      target: '3 sett x 10-12 reps (eller 3 x 15 sek sprett)'
-    }
-  ]
+  0: STANDARD_EXERCISES,
+  1: STANDARD_EXERCISES,
+  2: STANDARD_EXERCISES,
+  3: STANDARD_EXERCISES,
+  default: STANDARD_EXERCISES
 };
+
+/**
+ * Legger til et antall uker til en gitt dato (YYYY-MM-DD)
+ */
+export function extendDateByWeeks(dateStr, weeksCount = 4) {
+  const date = new Date(dateStr + 'T00:00:00');
+  date.setDate(date.getDate() + (weeksCount * 7));
+  return formatDateKey(date);
+}
+
+/**
+ * Henter øvelsene for en gitt dag, inkludert eventuelle egne linjer lagt inn av brukeren
+ */
+export function getDayExercises(day, state = {}) {
+  if (state.dayExercises && Array.isArray(state.dayExercises[day.dateKey])) {
+    return state.dayExercises[day.dateKey];
+  }
+  return day.exercises || [];
+}
 
 /**
  * Formaterer en dato til YYYY-MM-DD
@@ -138,14 +102,14 @@ export function formatNorwegianDate(date, short = false) {
 
 /**
  * Genererer planen for perioden
- * @param {string} startDateStr - f.eks. "2026-09-12"
- * @param {string} endDateStr - f.eks. "2026-10-12"
+ * @param {string} startDateStr - standard "2026-09-15"
+ * @param {string} endDateStr - standard "2026-11-15" (utvidet til november)
  * @param {number} startRehabWeek - standard 24
  * @param {Object} customWeeklyExercises - overstyrte øvelser per ukeindeks
  */
 export function generatePlan(
   startDateStr = '2026-09-15',
-  endDateStr = '2026-10-15',
+  endDateStr = '2026-11-15',
   startRehabWeek = 24,
   customWeeklyExercises = {},
   skippedDays = {}
@@ -185,7 +149,7 @@ export function generatePlan(
     const rehabWeek = startRehabWeek + weekIndex;
     
     // Hent øvelsene for denne uken
-    const weekExercises = customWeeklyExercises[weekIndex] || DEFAULT_EXERCISES[Math.min(weekIndex, 3)];
+    const weekExercises = customWeeklyExercises[weekIndex] || DEFAULT_EXERCISES[weekIndex] || DEFAULT_EXERCISES.default || STANDARD_EXERCISES;
 
     days.push({
       index: dayIndex,
@@ -240,24 +204,15 @@ export function generatePlan(
 /**
  * Beregner fremdriftsstatistikk og streak
  * @param {Object} plan - resultatet fra generatePlan
- * @param {Object} state - { completedDays: { [dateKey]: boolean }, completedExercises: { [dateKey]: { [exId]: boolean } } }
+ * @param {Object} state - { completedDays: { [dateKey]: boolean }, completedExercises: { [dateKey]: { [exId]: boolean } }, dayExercises: {} }
  */
 export function calculateStats(plan, state = {}) {
-  const completedDays = state.completedDays || {};
-  const completedExercises = state.completedExercises || {};
-
   const workoutDays = plan.days.filter(d => d.isWorkoutDay);
   const totalWorkouts = workoutDays.length;
 
   let completedWorkouts = 0;
   workoutDays.forEach(day => {
-    // En dag regnes som fullført enten hvis completedDays[dateKey] er sann,
-    // ELLER hvis alle 3 øvelsene for dagen er krysset av.
-    const isMarked = !!completedDays[day.dateKey];
-    const dayExs = completedExercises[day.dateKey] || {};
-    const allExCompleted = day.exercises.length > 0 && day.exercises.every(ex => !!dayExs[ex.id]);
-
-    if (isMarked || allExCompleted) {
+    if (isDayFullyCompleted(day, state)) {
       completedWorkouts++;
     }
   });
@@ -320,16 +275,19 @@ export function calculateStats(plan, state = {}) {
 
 /**
  * Sjekker om en konkret treningsdag er fullført
+ * En dag regnes som fullført hvis den eksplisitt er markert i completedDays (uavhengig av sjekkliste),
+ * eller hvis alle øvelser for dagen (inkl. egne linjer) er krysset av.
  */
 export function isDayFullyCompleted(day, state = {}) {
   if (!day.isWorkoutDay || day.isSkipped) return false;
   const completedDays = state.completedDays || {};
   if (completedDays[day.dateKey]) return true;
 
+  const exercises = getDayExercises(day, state);
   const dayExs = (state.completedExercises && state.completedExercises[day.dateKey]) || {};
-  if (!day.exercises || day.exercises.length === 0) return false;
+  if (!exercises || exercises.length === 0) return false;
 
-  return day.exercises.every(ex => !!dayExs[ex.id]);
+  return exercises.every(ex => !!dayExs[ex.id]);
 }
 
 /**

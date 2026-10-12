@@ -10,13 +10,16 @@ import {
   calculateStats,
   isDayFullyCompleted,
   hasDayNote,
+  getDayExercises,
+  extendDateByWeeks,
   formatNorwegianDate,
   formatDateKey,
   getMotivationalMessage,
-  DEFAULT_EXERCISES
+  DEFAULT_EXERCISES,
+  STANDARD_EXERCISES
 } from '../tracker-core.js';
 
-test('generatePlan genererer riktig antall dager og uker fra 15. sep til 15. okt som standard', () => {
+test('generatePlan genererer riktig antall dager og uker fra 15. sep til 15. okt når spesifisert', () => {
   const plan = generatePlan('2026-09-15', '2026-10-15', 24);
 
   // 15. sep til 15. okt er 31 dager (16 dager i sep: 15-30 + 15 dager i okt: 1-15)
@@ -32,7 +35,8 @@ test('generatePlan genererer riktig antall dager og uker fra 15. sep til 15. okt
   assert.equal(plan.days[0].dayName, 'Tirsdag');
   assert.equal(plan.days[0].isWorkoutDay, true);
   assert.equal(plan.days[0].workoutNumber, 1);
-  assert.equal(plan.days[0].exercises.length, 3);
+  // Standardøvelser avtalt med fysioterapeut: Ett-beins tåhev m/ drop-sett og Bulgarsk utfall
+  assert.equal(plan.days[0].exercises.length, 2);
 
   // Andre dag er 16. sep (onsdag) og skal være hviledag
   assert.equal(plan.days[1].dateKey, '2026-09-16');
@@ -70,7 +74,7 @@ test('calculateStats beregner fullførte økter og prosentandel korrekt', () => 
   assert.equal(stats1.completedWorkouts, 1);
   assert.equal(stats1.percentage, 6); // 1 / 16 = 6.25% -> 6%
 
-  // Marker andre treningsdag (17. sep) ved å krysse av alle 3 øvelser
+  // Marker andre treningsdag (17. sep) ved å krysse av alle øvelser
   const state2 = {
     completedDays: {
       '2026-09-15': true
@@ -78,8 +82,7 @@ test('calculateStats beregner fullførte økter og prosentandel korrekt', () => 
     completedExercises: {
       '2026-09-17': {
         'ex-1': true,
-        'ex-2': true,
-        'ex-3': true
+        'ex-2': true
       }
     }
   };
@@ -87,12 +90,11 @@ test('calculateStats beregner fullførte økter og prosentandel korrekt', () => 
   assert.equal(stats2.completedWorkouts, 2);
   assert.equal(stats2.percentage, 13); // 2 / 16 = 12.5% -> 13%
 
-  // Delvis fullført økt (kun 2 av 3 øvelser) skal ikke telle som fullført dag hvis ikke eksplisitt markert
+  // Delvis fullført økt (kun 1 av 2 øvelser) skal ikke telle som fullført hvis ikke eksplisitt markert
   const state3 = {
     completedExercises: {
       '2026-09-19': {
-        'ex-1': true,
-        'ex-2': true
+        'ex-1': true
       }
     }
   };
@@ -137,8 +139,7 @@ test('isDayFullyCompleted fungerer for både hele dager og individuelle øvelser
     completedExercises: {
       '2026-09-15': {
         'ex-1': true,
-        'ex-2': true,
-        'ex-3': true
+        'ex-2': true
       }
     }
   };
@@ -288,4 +289,113 @@ test('hasDayNote gjenkjenner ikke-tomme notater for alternativ trening', () => {
   assert.equal(hasDayNote('2026-09-16', { notes: { '2026-09-16': '   ' } }), false);
   assert.equal(hasDayNote('2026-09-16', { notes: { '2026-09-16': 'Syklet 30 min' } }), true);
   assert.equal(hasDayNote('2026-09-15', { notes: { '2026-09-16': 'Syklet 30 min' } }), false);
+});
+
+test('isDayFullyCompleted tillater å sette fullført uavhengig av sjekkliste', () => {
+  const plan = generatePlan('2026-09-15', '2026-11-15', 24);
+  const day0 = plan.days[0]; // 15. sep
+
+  // Uten avkryssede øvelser, men markert i completedDays
+  const state = {
+    completedDays: {
+      '2026-09-15': true
+    },
+    completedExercises: {
+      '2026-09-15': {
+        'ex-1': false
+      }
+    }
+  };
+  assert.equal(isDayFullyCompleted(day0, state), true);
+
+  const stats = calculateStats(plan, state);
+  assert.equal(stats.completedWorkouts, 1);
+});
+
+test('getDayExercises støtter egne linjer og fjerning av linjer per treningsdag', () => {
+  const plan = generatePlan('2026-09-15', '2026-11-15', 24);
+  const day0 = plan.days[0];
+
+  // Standard gir 2 øvelser
+  const defaultExs = getDayExercises(day0, {});
+  assert.equal(defaultExs.length, 2);
+  assert.equal(defaultExs[0].name, 'Ett-beins tåhev (m/ drop-sett)');
+
+  // Med egne linjer lagret i state.dayExercises
+  const stateWithCustom = {
+    dayExercises: {
+      '2026-09-15': [
+        { id: 'custom-1', name: 'Bulgarsk utfall ekstra tung', target: '4x8' }
+      ]
+    }
+  };
+  const customExs = getDayExercises(day0, stateWithCustom);
+  assert.equal(customExs.length, 1);
+  assert.equal(customExs[0].name, 'Bulgarsk utfall ekstra tung');
+});
+
+test('extendDateByWeeks utvider sluttdatoen korrekt', () => {
+  const extended = extendDateByWeeks('2026-10-15', 4);
+  // 15. okt + 28 dager = 12. nov 2026
+  assert.equal(extended, '2026-11-12');
+});
+
+test('Standard generatePlan oppretter utvidet kalender til 15. november (62 dager, 31 økter)', () => {
+  const plan = generatePlan();
+  assert.equal(plan.startDateStr, '2026-09-15');
+  assert.equal(plan.endDateStr, '2026-11-15');
+  assert.equal(plan.totalDays, 62);
+  assert.equal(plan.totalWorkoutDays, 31);
+  assert.equal(plan.totalRestDays, 31);
+});
+
+test('STANDARD_EXERCISES inneholder kun de to avtalte øvelsene fra fysioterapeut 12. oktober', () => {
+  assert.equal(STANDARD_EXERCISES.length, 2);
+  assert.equal(STANDARD_EXERCISES[0].name, 'Ett-beins tåhev (m/ drop-sett)');
+  assert.ok(STANDARD_EXERCISES[0].name.includes('drop-sett'));
+  assert.ok(STANDARD_EXERCISES[0].description.includes('tobeins opp og ett bein ned til failure'));
+  assert.equal(STANDARD_EXERCISES[1].name, 'Bulgarsk utfall');
+});
+
+test('isDayFullyCompleted og calculateStats håndterer delvis avkrysning med uavhengig fullført', () => {
+  const plan = generatePlan();
+  const day0 = plan.days[0];
+
+  // Bruker har bare krysset av 1 øvelse, men satt dagen som fullført
+  const state = {
+    completedDays: {
+      [day0.dateKey]: true
+    },
+    completedExercises: {
+      [day0.dateKey]: {
+        'ex-1': true,
+        'ex-2': false
+      }
+    }
+  };
+
+  assert.equal(isDayFullyCompleted(day0, state), true);
+  const stats = calculateStats(plan, state);
+  assert.equal(stats.completedWorkouts, 1);
+});
+
+test('getDayExercises returnerer tom liste hvis alle linjer fjernes', () => {
+  const plan = generatePlan();
+  const day0 = plan.days[0];
+
+  const state = {
+    dayExercises: {
+      [day0.dateKey]: []
+    }
+  };
+
+  const exs = getDayExercises(day0, state);
+  assert.equal(exs.length, 0);
+
+  // Uten completedDays satt er dagen ikke fullført
+  assert.equal(isDayFullyCompleted(day0, state), false);
+
+  // Men hvis completedDays settes til true, er dagen fullført selv med 0 øvelser
+  state.completedDays = { [day0.dateKey]: true };
+  assert.equal(isDayFullyCompleted(day0, state), true);
 });
