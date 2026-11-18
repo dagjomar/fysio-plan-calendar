@@ -1,6 +1,6 @@
 # Fysio Plan Calendar – Akilles Senerehabilitering
 
-Interaktiv treningsplan og kalender for opptrening etter akillesseneruptur, spesifikt tilpasset **Uke 24 til 28** (15. september – 15. oktober).
+Interaktiv treningsplan og kalender for opptrening etter akillesseneruptur, spesifikt tilpasset **Uke 24 til 39** (15. september – 31. desember).
 
 ## Innhold
 

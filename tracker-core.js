@@ -103,13 +103,13 @@ export function formatNorwegianDate(date, short = false) {
 /**
  * Genererer planen for perioden
  * @param {string} startDateStr - standard "2026-09-15"
- * @param {string} endDateStr - standard "2026-11-15" (utvidet til november)
+ * @param {string} endDateStr - standard "2026-12-31" (utvidet ut desember)
  * @param {number} startRehabWeek - standard 24
  * @param {Object} customWeeklyExercises - overstyrte øvelser per ukeindeks
  */
 export function generatePlan(
   startDateStr = '2026-09-15',
-  endDateStr = '2026-11-15',
+  endDateStr = '2026-12-31',
   startRehabWeek = 24,
   customWeeklyExercises = {},
   skippedDays = {}
@@ -309,7 +309,7 @@ export function getMotivationalMessage(percentage) {
   } else if (percentage < 50) {
     return 'Strålende driv! Du bygger senestyrke dag for dag. Superkompensasjon skjer på hviledagene!';
   } else if (percentage < 75) {
-    return 'Over halvveis i 4-ukers perioden! Senen tåler mer og mer belastning. Hold rytmen oppe!';
+    return 'Over halvveis i perioden! Senen tåler mer og mer belastning. Hold rytmen oppe!';
   } else if (percentage < 100) {
     return 'Sluttspurten i denne fasen! Du er straks klar for neste rehabiliteringssteg sammen med fysio!';
   } else {
