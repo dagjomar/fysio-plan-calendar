@@ -29,12 +29,12 @@ let state = {
   dayExercises: {},
   theme: 'light',
   selectedDateKey: null,
-  endDate: '2026-11-15'
+  endDate: '2026-12-31'
 };
 
-// Start- og sluttdatoer for perioden (Starter tirsdag 15. september, standard til 15. november)
+// Start- og sluttdatoer for perioden (Starter tirsdag 15. september, standard ut desember)
 const START_DATE = '2026-09-15';
-const DEFAULT_END_DATE = '2026-11-15';
+const DEFAULT_END_DATE = '2026-12-31';
 const START_REHAB_WEEK = 24;
 
 let currentPlan = null;
@@ -49,7 +49,7 @@ function loadState() {
       const parsed = JSON.parse(raw);
       state = { ...state, ...parsed };
     }
-    // Sørg for at kalenderen utvides til minst 15. november for eksisterende lagret tilstand
+    // Sørg for at kalenderen utvides til minst 31. desember for eksisterende lagret tilstand
     if (!state.endDate || state.endDate < DEFAULT_END_DATE) {
       state.endDate = DEFAULT_END_DATE;
     }

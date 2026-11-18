@@ -1,8 +1,8 @@
-# Opptrening etter Akillesseneruptur – Utvidet Treningsplan (Uke 24–32)
+# Opptrening etter Akillesseneruptur – Utvidet Treningsplan (Uke 24–39)
 
-**Periode:** 15. september – 15. november (Utvidbar med +4 uker etter behov)  
+**Periode:** 15. september – 31. desember (Utvidbar med +4 uker etter behov)  
 **Fokus:** Muskelvekst, seneadapsjon og utjevning av styrke-/volumforskjell  
-**Frekvens:** Annenhver dag (31 planlagte økter, 31 hviledager)  
+**Frekvens:** Annenhver dag (54 planlagte økter, 54 hviledager)  
 **Status etter fysioterapeut 12. oktober:**  
 - **1 cm forskjell i leggmuskel** (skadet vs. frisk legg).  
 - **Drop-sett til failure:** Umiddelbart etter siste sett på ett-beins tåhev, begynn på tobeins opp og ett bein ned for å øke belastningen og dra ut det siste av muskelen til failure.  
@@ -47,7 +47,7 @@
 
 ---
 
-## 🗓️ Uke-for-uke Kalender (Uke 24–32)
+## 🗓️ Uke-for-uke Kalender (Uke 24–39)
 
 ### Uke 24 (15. sep – 21. sep)
 - [ ] **Tirsdag 15. sep (Økt 1):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
@@ -121,10 +121,70 @@
 - [ ] **Søndag 8. nov (Økt 28):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
 - 💤 *Mandag 9. nov:* Hviledag
 
-### Uke 32 (10. nov – 15. nov)
+### Uke 32 (10. nov – 16. nov)
 - [ ] **Tirsdag 10. nov (Økt 29):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
 - 💤 *Onsdag 11. nov:* Hviledag
 - [ ] **Torsdag 12. nov (Økt 30):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
 - 💤 *Fredag 13. nov:* Hviledag
 - [ ] **Lørdag 14. nov (Økt 31):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
-- 💤 *Søndag 15. nov:* Hviledag / Evaluering av muskelomkrets
+- 💤 *Søndag 15. nov:* Hviledag / Evaluering av muskelomkrets (8 uker)
+- [ ] **Mandag 16. nov (Økt 32):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+
+### Uke 33 (17. nov – 23. nov)
+- 💤 *Tirsdag 17. nov:* Hviledag
+- [ ] **Onsdag 18. nov (Økt 33):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Torsdag 19. nov:* Hviledag
+- [ ] **Fredag 20. nov (Økt 34):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Lørdag 21. nov:* Hviledag
+- [ ] **Søndag 22. nov (Økt 35):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Mandag 23. nov:* Hviledag
+
+### Uke 34 (24. nov – 30. nov)
+- [ ] **Tirsdag 24. nov (Økt 36):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Onsdag 25. nov:* Hviledag
+- [ ] **Torsdag 26. nov (Økt 37):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Fredag 27. nov:* Hviledag
+- [ ] **Lørdag 28. nov (Økt 38):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Søndag 29. nov:* Hviledag
+- [ ] **Mandag 30. nov (Økt 39):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+
+### Uke 35 (1. des – 7. des) – *Desember*
+- 💤 *Tirsdag 1. des:* Hviledag
+- [ ] **Onsdag 2. des (Økt 40):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Torsdag 3. des:* Hviledag
+- [ ] **Fredag 4. des (Økt 41):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Lørdag 5. des:* Hviledag
+- [ ] **Søndag 6. des (Økt 42):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Mandag 7. des:* Hviledag
+
+### Uke 36 (8. des – 14. des)
+- [ ] **Tirsdag 8. des (Økt 43):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Onsdag 9. des:* Hviledag
+- [ ] **Torsdag 10. des (Økt 44):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Fredag 11. des:* Hviledag
+- [ ] **Lørdag 12. des (Økt 45):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Søndag 13. des:* Hviledag
+- [ ] **Mandag 14. des (Økt 46):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+
+### Uke 37 (15. des – 21. des)
+- 💤 *Tirsdag 15. des:* Hviledag / 3-måneders evaluering av akillessene og muskelomkrets
+- [ ] **Onsdag 16. des (Økt 47):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Torsdag 17. des:* Hviledag
+- [ ] **Fredag 18. des (Økt 48):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Lørdag 19. des:* Hviledag
+- [ ] **Søndag 20. des (Økt 49):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Mandag 21. des:* Hviledag
+
+### Uke 38 (22. des – 28. des) – *Juleuken*
+- [ ] **Tirsdag 22. des (Økt 50):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Onsdag 23. des:* Hviledag
+- [ ] **Torsdag 24. des (Økt 51):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall (Julaften)
+- 💤 *Fredag 25. des:* Hviledag
+- [ ] **Lørdag 26. des (Økt 52):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Søndag 27. des:* Hviledag
+- [ ] **Mandag 28. des (Økt 53):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+
+### Uke 39 (29. des – 31. des) – *Romjul & Nyttår*
+- 💤 *Tirsdag 29. des:* Hviledag
+- [ ] **Onsdag 30. des (Økt 54):** Ett-beins tåhev m/ drop-sett · Bulgarsk utfall
+- 💤 *Torsdag 31. des:* Hviledag (Nyttårsaften / Årsevaluering)

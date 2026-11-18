@@ -335,18 +335,37 @@ test('getDayExercises støtter egne linjer og fjerning av linjer per treningsdag
 });
 
 test('extendDateByWeeks utvider sluttdatoen korrekt', () => {
-  const extended = extendDateByWeeks('2026-10-15', 4);
+  const extendedOkt = extendDateByWeeks('2026-10-15', 4);
   // 15. okt + 28 dager = 12. nov 2026
-  assert.equal(extended, '2026-11-12');
+  assert.equal(extendedOkt, '2026-11-12');
+
+  const extendedNov = extendDateByWeeks('2026-11-15', 4);
+  // 15. nov + 28 dager = 13. des 2026
+  assert.equal(extendedNov, '2026-12-13');
 });
 
-test('Standard generatePlan oppretter utvidet kalender til 15. november (62 dager, 31 økter)', () => {
+test('Standard generatePlan oppretter utvidet kalender ut desember (108 dager, 54 økter til 31. desember)', () => {
   const plan = generatePlan();
   assert.equal(plan.startDateStr, '2026-09-15');
-  assert.equal(plan.endDateStr, '2026-11-15');
-  assert.equal(plan.totalDays, 62);
-  assert.equal(plan.totalWorkoutDays, 31);
-  assert.equal(plan.totalRestDays, 31);
+  assert.equal(plan.endDateStr, '2026-12-31');
+  assert.equal(plan.totalDays, 108);
+  assert.equal(plan.totalWorkoutDays, 54);
+  assert.equal(plan.totalRestDays, 54);
+  assert.equal(plan.weeks.length, 16);
+  assert.equal(plan.weeks[0].rehabWeek, 24);
+  assert.equal(plan.weeks[plan.weeks.length - 1].rehabWeek, 39);
+});
+
+test('generatePlan kan opprette kalender til spesifiserte datoer som 15. nov og 15. des', () => {
+  const planNov = generatePlan('2026-09-15', '2026-11-15', 24);
+  assert.equal(planNov.totalDays, 62);
+  assert.equal(planNov.totalWorkoutDays, 31);
+  assert.equal(planNov.totalRestDays, 31);
+
+  const planDes15 = generatePlan('2026-09-15', '2026-12-15', 24);
+  assert.equal(planDes15.totalDays, 92);
+  assert.equal(planDes15.totalWorkoutDays, 46);
+  assert.equal(planDes15.totalRestDays, 46);
 });
 
 test('STANDARD_EXERCISES inneholder kun de to avtalte øvelsene fra fysioterapeut 12. oktober', () => {
